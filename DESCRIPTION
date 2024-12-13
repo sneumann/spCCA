@@ -1,0 +1,10 @@
+Package: spCCA
+Type: Package
+Title: supervised penalized CCA for three data sets (2 biological, 1 design)
+Version: 0.1.5
+Date: 2013-12-12
+Suggests: RUnit
+Author: Andrea Thum, Steffen Neumann, Stefan Posch
+Maintainer: Andrea Thum <andrea.thum@informatik.uni-halle.de>, Steffen Neumann <sneumann@ipb-halle.de>
+Description: Combines sparse (penalized) CCA for 2 biological data sets with a third data set, the experimental design and tries to find correlations between biological data sets and design data set, that are well-explainable.
+License: GPL (>= 2)
