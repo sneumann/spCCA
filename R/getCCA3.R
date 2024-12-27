@@ -1,11 +1,6 @@
 #input: XYZ: biological data sets X,Y; design data set Z
 #       numCV number of canonical variables
 #
-#output:    cc3.weights.{xyz}: matrices with weight vectors for each canonical variable (columnwise)
-#           cc3.CV.{xyz}: matrices with canonical variables (columnwise)
-#           corr: matrix with correlation coefficient for pairwise (X-Y,X-Z,YZ) and correlation of can. variable: sum(corr(X-Z),corr(Y-Z))/2 (columnwise)
-#           lambda: best lambda.{xyz} for each can. var. (columnwise)
-
 
 #' Title
 #'
@@ -18,7 +13,11 @@
 #' @param n.r 
 #' @param max.counter.test 
 #'
-#' @return
+#' @return A list with the elements 
+#'   cc3.weights.{xyz}: matrices with weight vectors for each canonical variable (columnwise)
+#'   cc3.CV.{xyz}: matrices with canonical variables (columnwise)
+#'   corr: matrix with correlation coefficient for pairwise (X-Y,X-Z,YZ) and correlation of can. variable: sum(corr(X-Z),corr(Y-Z))/2 (columnwise)
+#'   lambda: best lambda.{xyz} for each can. var. (columnwise)
 #' @export
 #'
 #' @examples

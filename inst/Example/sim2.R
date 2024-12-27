@@ -89,17 +89,19 @@ create.Sim.Dataset<-function() {
 }
 
 test.CCA.forSim<-function(){
-    source("get.best.lambdas.R")
-    source("getCCA3.R")
-    source("plotCCA.R")
-    source("save.CCA.R")
-    source("scca.function3.R")
+    # source("get.best.lambdas.R")
+    # source("getCCA3.R")
+    # source("plotCCA.R")
+    # source("save.CCA.R")
+    # source("scca.function3.R")
+  
+    # library(spCCA)  
 
     X2<-read.table("simX.txt",sep="\t")
     Y2<-read.table("simY.txt",sep="\t")
     Z2<-read.table("simZ.txt",sep="\t")
 
-    CCA3<-getCCA3(X2,Y2,Z2,4)
+    CCA3 <- getCCA3(X=X2, Y=Y2, Z=Z2, numCV=4)
 
 }
 
