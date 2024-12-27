@@ -7,7 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(waldo)
 library(spCCA)
 
 test_check("spCCA")

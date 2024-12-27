@@ -32,7 +32,7 @@
 #'
 #' @return
 #' @export
-#' @importfrom stats var cor medien runif lm
+#' @importFrom stats var cor medien runif lm
 #' @importFrom graphics axis lines
 #' @importFrom grDevices dev.off pdf rainbow 
 #' 

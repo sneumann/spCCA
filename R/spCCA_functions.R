@@ -40,6 +40,7 @@ comparePattern <- function(x, y, dm = c("manhattan", "euklidean"))
 #' @export
 #'
 #' @examples
+
 addPattern <- function(List.Pattern, corr, xyz.vector, z.vector) {
   if (length(List.Pattern) == 0) {
     List.Pattern <- list(list(corr, matrix(
@@ -47,8 +48,7 @@ addPattern <- function(List.Pattern, corr, xyz.vector, z.vector) {
     ), 1))
     
     #print(muster)
-  } else
-  {
+  } else {
     found <- F
     for (i in 1:length(List.Pattern)) {
       items <- List.Pattern[[i]]

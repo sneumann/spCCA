@@ -4,7 +4,10 @@ Title: supervised penalized CCA for three data sets (2 biological, 1 design)
 Version: 0.1.6
 Date: 2024-12-25
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    BiocStyle,
+    knitr, 
+    rmarkdown
 Author: Andrea Thum, Steffen Neumann, Stefan Posch
 Author@R: c(person("Andrea", "Thum", role = "cre", email="andrea.thum@informatik.uni-halle.de"),
            person("Steffen", "Neumann", role = , email="sneumann@ipb-halle.de"),
@@ -21,4 +24,5 @@ Collate: getCCA3.R
      scca.function3Z.R
      spCCA-package.R
      spCCA_functions.R
+VignetteBuilder: knitr 
 RoxygenNote: 7.3.1
