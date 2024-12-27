@@ -10,6 +10,28 @@
 #           i: number of iterations (should not be max.iter!)
 #           null: at least one sparsity parameter lambda is too strict: weight vector = (0,...,0)
 
+#' Title
+#'
+#' @param XpZ 
+#' @param YpZ 
+#' @param ZpX 
+#' @param ZpY 
+#' @param dims 
+#' @param lambda.x 
+#' @param lambda.y 
+#' @param lambda.z 
+#' @param max.iter 
+#' @param shift 
+#' @param x.initial 
+#' @param y.initial 
+#' @param z.initial 
+#'
+#' @return
+#' @importFrom stats cor lm median runif var
+#' @export
+#'
+#' @examples
+#' TRUE
 scca.function3Z <- function(XpZ,YpZ,ZpX,ZpY, dims,lambda.x, lambda.y, lambda.z,max.iter = 500 ,shift=2, x.initial=NULL, y.initial=NULL, z.initial=NULL)
 {
 
