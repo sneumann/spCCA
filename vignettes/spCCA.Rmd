@@ -27,15 +27,14 @@ bibliography: lit.bib
 csl: biomed-central.csl
 ---
 
+```{r LibraryPreload, echo=FALSE, results='hide'}
+library(spCCA)
+```
+
 # Introduction
 
 [@Hotel36]
 
-# Acquisition
-
-```{r LibraryPreload, echo=FALSE, results='hide'}
-library(spCCA)
-```
 
 
 # References {.unnumbered}
