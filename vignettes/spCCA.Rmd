@@ -33,7 +33,23 @@ library(spCCA)
 
 # Introduction
 
-[@Hotel36]
+# Datasets
+
+```{r}
+X <- read.csv(system.file("arXiv.1405.1534", "MTBLS18.csv", package = "spCCA"))
+Y <- read.csv(system.file("arXiv.1405.1534", "E-MTAB-3287.csv", package = "spCCA"))
+Z <- read.csv(system.file("arXiv.1405.1534", "SAMEG179892.csv", package = "spCCA"))
+```
+
+# spCCA
+
+```{r}
+
+CCA3 <- getCCA3(X=X, Y=Y, Z=Z, numCV=7)
+
+```
+
+
 
 
 
