@@ -1,8 +1,8 @@
 
-#' Title
+#' Save CCA3 results to (human reabable) file
 #'
-#' @param CCA3 
-#' @param filename 
+#' @param CCA3 list with CCA3 information to save
+#' @param filename base output filename (_numcv.txt be appended)
 #'
 #' @return
 #' @export
@@ -11,7 +11,7 @@
 #' TRUE
 save.CCA <- function(CCA3, filename) {
   for (numcv in c(1:dim(CCA3$cc3.weight.x)[2])) {
-    Sxj <- sort(abs(CCA3$cc3.weight.x[, numcv]), decreasing = T)#absteigend nach Gewicht die Vektoren
+    Sxj <- sort(abs(CCA3$cc3.weight.x[, numcv]), decreasing = T) # # decreasing by weight vectors
     oS <- order(abs(CCA3$cc3.weight.x[, numcv]), decreasing = T)
     Sxj <- Sxj * sign(CCA3$cc3.weight.x[, numcv])[oS]
     
@@ -23,26 +23,15 @@ save.CCA <- function(CCA3, filename) {
     oS <- order(abs(CCA3$cc3.weight.z[, numcv]), decreasing = T)
     Szj <- Szj * sign(CCA3$cc3.weight.z[, numcv])[oS]
     
-    lambdas <- paste("lambda.x:",
-                     CCA3$lambda[1, numcv],
-                     "lambda.y:",
-                     CCA3$lambda[2, numcv],
-                     "lambda.z:",
-                     CCA3$lambda[3, numcv])
+    lambdas <- paste("lambda.x:", CCA3$lambda[1, numcv],
+                     "lambda.y:", CCA3$lambda[2, numcv],
+                     "lambda.z:", CCA3$lambda[3, numcv])
     corr <- CCA3$corr[numcv]
     fname = paste(filename, "_", numcv, ".txt", sep = "")
     
-    write(
-      file = fname,
-      paste(
-        "Results spCCA, lambdas:",
-        lambdas,
-        "\n",
-        paste(numcv, ". Variable", sep = ""),
-        "correlation:",
-        corr,
-        "\n"
-      ),
+    write(file = fname,
+      paste("Results spCCA, lambdas:", lambdas, "\n",
+        paste(numcv, ". Variable", sep = ""), "correlation:", corr, "\n"),
       append = F
     )
     for (j in 1:length(Sxj)) {
@@ -66,6 +55,5 @@ save.CCA <- function(CCA3, filename) {
       out <- paste(names(Szj)[j], Szj[j], sep = "\t")
       write(out, file = fname, append = TRUE)
     }
-    
   }
 }

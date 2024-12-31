@@ -1,6 +1,6 @@
 #' compare patterns of two eigenvectors
 #' 
-#' return manhattan distance by default; other distances possible
+#' return manhattan (default) or euklidean distance
 #'
 #' @param x,y vectors to compare  
 #' @param dm distance measure, default is manhattan
@@ -43,20 +43,19 @@ comparePattern <- function(x, y, dm = c("manhattan", "euklidean"))
 
 addPattern <- function(List.Pattern, corr, xyz.vector, z.vector) {
   if (length(List.Pattern) == 0) {
-    List.Pattern <- list(list(corr, matrix(
-      xyz.vector, ncol = 1, nrow = length(xyz.vector)
-    ), 1))
-    
-    #print(muster)
+    List.Pattern <- list(list(corr, 
+                              matrix(xyz.vector, 
+                                     ncol = 1, 
+                                     nrow = length(xyz.vector)), 
+                              1))
   } else {
     found <- F
     for (i in 1:length(List.Pattern)) {
       items <- List.Pattern[[i]]
       s <- dim(items[[2]])[1] - length(z.vector) + 1
       e <- dim(items[[2]])[1]
-      if (comparePattern(z.vector, rowMeans(as.matrix(items[[2]][s:e, ]))) <=
-          0.5) {
-        #gleiches Muster
+      if (comparePattern(z.vector, rowMeans(as.matrix(items[[2]][s:e, ]))) <= 0.5) {
+        # same pattern
         found <- T
         List.Pattern[[i]][[3]] <- List.Pattern[[i]][[3]] + 1
         List.Pattern[[i]][[1]] = List.Pattern[[i]][[1]] + corr
@@ -65,13 +64,11 @@ addPattern <- function(List.Pattern, corr, xyz.vector, z.vector) {
       }
     }
     if (!found) {
-      List.Pattern <- append(List.Pattern, list(list(
-        corr, matrix(
-          xyz.vector,
-          ncol = 1,
-          nrow = length(xyz.vector)
-        ), 1
-      )))
+      List.Pattern <- append(List.Pattern, list(list(corr, 
+                                                     matrix(xyz.vector,
+                                                            ncol = 1,
+                                                            nrow = length(xyz.vector)), 
+                                                     1)))
     }
   }
   return(List.Pattern)

@@ -1,18 +1,11 @@
-
-
-#legend: e.g. c("Genes","Metabolites","Patterns")
-#
-
-
-
-
-#' Title
+#' Plot CCA results to PDF file(s)
 #'
-#' @param CCA3 
-#' @param X 
-#' @param Y 
-#' @param filename 
-#' @param legend 
+#' Plot Canonical Variables and top features for each canonical variable
+#' 
+#' @param CCA3 list with CCA3 information to plot
+#' @param X,Y 
+#' @param filename base output filename (_CV_numcv.pdf and _Top_numcv.pdf will be appended)
+#' @param legend e.g. c("Genes","Metabolites","Patterns")
 #'
 #' @return
 #' @export
@@ -23,9 +16,10 @@ plotCCA <- function(CCA3, X, Y, filename, legend) {
   CV.X = CCA3$cc3.CV.x
   CV.Y = CCA3$cc3.CV.y
   CV.Z = CCA3$cc3.CV.z
-  numberCanVar <- dim(CV.X)[2]#number of can. variables
+
+  numberCanVar <- dim(CV.X)[2] # number of can. variables
   for (numcv in 1:numberCanVar) {
-    #plot latent variable
+    # plot latent variable
     x.cv <- CV.X[, numcv]
     x.cv.length <- as.numeric(sqrt(t(x.cv) %*% x.cv))
     x.cv <- x.cv / x.cv.length
@@ -44,7 +38,6 @@ plotCCA <- function(CCA3, X, Y, filename, legend) {
     maxy <- max(abs(c(x.cv, y.cv, z.cv)))
     miny <- min(abs(c(x.cv, y.cv, z.cv)))
     
-    
     maxyy <- ceiling(maxy / 10 ^ (floor(log(maxy, 10)))) * (10 ^ floor(log(maxy, 10)))
     if (min(c(x.cv, y.cv, z.cv)) > 0)
       minyy <- 0
@@ -59,18 +52,16 @@ plotCCA <- function(CCA3, X, Y, filename, legend) {
       pvy <- c(pvy, x.cv[i], x.cv[i])
     
     pdf(paste(filename, "_CV_", numcv, ".pdf", sep = ""))
-    plot(
-      pvx + 0.4,
-      pvy,
-      ylim = c(minyy, maxyy),
-      main = paste(numcv, ". canonical variable", sep = ""),
-      type = "l",
-      col = "green",
-      xlab = "Experiments",
-      ylab = "Normalized Intensity",
-      axes = F,
-      frame.plot = T
-    )
+    plot(pvx + 0.4,
+         pvy,
+         ylim = c(minyy, maxyy),
+         main = paste(numcv, ". canonical variable", sep = ""),
+         type = "l",
+         col = "green",
+         xlab = "Experiments",
+         ylab = "Normalized Intensity",
+         axes = F,
+         frame.plot = T)
     
     pvy <- c()
     for (i in 1:dim(CV.X)[1])
@@ -85,23 +76,19 @@ plotCCA <- function(CCA3, X, Y, filename, legend) {
     }
     
     axis(2, at = (c(0:6) * (maxyy - minyy)) / 5 + minyy)
-    legend(
-      "topright" ,
-      legend,
-      cex = 0.8,
-      col = c("green", "blue", "red"),
-      pch = rep(1, 3),
-      lty = 1:2
-    )
+    legend("topright" ,
+           legend,
+           cex = 0.8,
+           col = c("green", "blue", "red"),
+           pch = rep(1, 3),
+           lty = 1:2)
     
     dev.off()
+    
     ######################################################
-    
-    
     #plot top features
     
-    
-    Sxj <- sort(abs(CCA3$cc3.weight.x[, numcv]), decreasing = T)#absteigend nach Gewicht die Vektoren
+    Sxj <- sort(abs(CCA3$cc3.weight.x[, numcv]), decreasing = T) # decreasing by weight vectors
     Syj <- sort(abs(CCA3$cc3.weight.y[, numcv]), decreasing = T)
     
     plot2 <- names(Syj)[1:2]
@@ -133,17 +120,15 @@ plotCCA <- function(CCA3, X, Y, filename, legend) {
       pvx <- c(pvx, i - 1, i)
     
     pdf(paste(filename, "_Top_", numcv, ".pdf", sep = ""))
-    plot(
-      pvx + 0.3,
-      pvy,
-      ylim = c(minyy, maxyy),
-      xlab = "Experiments",
-      ylab = "Intensity",
-      col = colors1[1],
-      axes = F,
-      type = "l",
-      frame.plot = T
-    )
+    plot(pvx + 0.3,
+         pvy,
+         ylim = c(minyy, maxyy),
+         xlab = "Experiments",
+         ylab = "Intensity",
+         col = colors1[1],
+         axes = F,
+         type = "l",
+         frame.plot = T)
     
     axis(2, at = (c(0:6) * (maxyy - minyy)) / 5 + minyy)
     if (length(plot1) > 1) {
@@ -162,16 +147,13 @@ plotCCA <- function(CCA3, X, Y, filename, legend) {
         lines(pvx + 0.3, pvy, col = colors2[j], type = "l")
       }
     }
-    legend(
-      "topright" ,
-      rownames(D3),
-      cex = 0.8,
-      col = c(colors1[1:length(plot1)], colors2[1:length(plot2)]),
-      pch = rep(1, length(c(plot1, plot2))),
-      lty = 1:2
-    )
+    legend("topright" ,
+           rownames(D3),
+           cex = 0.8,
+           col = c(colors1[1:length(plot1)], colors2[1:length(plot2)]),
+           pch = rep(1, length(c(plot1, plot2))),
+           lty = 1:2)
     
     dev.off()
   }
-  
 }

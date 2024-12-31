@@ -1,4 +1,6 @@
 #' Title scca.function3Z
+#' 
+#' This function is called by get.best.lambdas()
 #'
 #' @param XpZ,YpZ,ZpX,ZpY XpZ = regularized Pseudoinverse(X) * Z, analogously: YpZ, ZpX, ZpY with X,Y: biol. data sets; Z: design data set
 #' @param dims 
@@ -41,7 +43,7 @@ scca.function3Z <- function(XpZ, YpZ, ZpX, ZpY,
   if (is.null(y.initial))
     y.initial <- runif(q)
   
-  #normalize
+  # normalize
   x.initial <- x.initial / as.numeric(sqrt(t(x.initial) %*% x.initial))
   y.initial <- y.initial / as.numeric(sqrt(t(y.initial) %*% y.initial))
   z.initial <- z.initial / as.numeric(sqrt(t(z.initial) %*% z.initial))
@@ -51,7 +53,7 @@ scca.function3Z <- function(XpZ, YpZ, ZpX, ZpY,
   diff.z <- eps * 10
   
   nextstart = FALSE
-  i <- 0		# number of iterations used by SCCA
+  i <- 0	# number of iterations used by SCCA
   
   while ((i < max.iter) &
          ((diff.x > eps) || (diff.y > eps) || (diff.z > eps)))
@@ -149,9 +151,9 @@ scca.function3Z <- function(XpZ, YpZ, ZpX, ZpY,
     
   } # while diff.x
   
-  list(x.new = x.initial,
-      y.new = y.initial,
-      z.new = z.initial,
-      i = i,
-      null = isnull)
+  return(list(x.new = x.initial,
+              y.new = y.initial,
+              z.new = z.initial,
+              i = i,
+              null = isnull))
 }

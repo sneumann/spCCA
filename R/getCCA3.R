@@ -1,17 +1,17 @@
-#input: XYZ: biological data sets X,Y; design data set Z
-#       numCV number of canonical variables
-#
-
-#' Title
+#' getCCA3
 #'
-#' @param X 
-#' @param Y 
-#' @param Z 
-#' @param end 
-#' @param step 
-#' @param numCV 
-#' @param n.r 
-#' @param max.counter.test 
+#' The getCCA3() function performs # STN confirm: Copilot says: sparse 
+#' canonical correlation analysis on three data matrices (X, Y, Z). 
+#' It normalizes the data matrices, computes canonical variables, 
+#' and updates the data matrices by removing the latent variables iteratively 
+#' for a specified number of canonical variables (numCV). 
+#' It returns a list containing matrices with weight vectors and canonical variables, 
+#' correlation coefficients, and optimal sparsity parameters (lambda values) 
+#' for each canonical variable.
+#' 
+#' @param X,Y,Z biological data sets X,Y; design data set Z 
+#' @param end,step,nr,max.counter.test passed to get.best.lambdas() # STN confirm: Copilot says: parameters for the optimization of the sparsity parameters 
+#' @param numCV number of canonical variables
 #'
 #' @return A list with the elements 
 #'   cc3.weights.{xyz}: matrices with weight vectors for each canonical variable (columnwise)
@@ -29,7 +29,8 @@ getCCA3 <- function(X, Y, Z,
                     n.r = 10,
                     max.counter.test = 10) {
   if (dim(X)[1] != dim(Y)[1] || dim(Y)[1] != dim(Z)[1])
-    stop("Data matrix has wrong sample size.")
+    stop("X,Y,Z data matrices have different sample sizes: ", 
+         dim(X)[1], " ", dim(Y)[1], " ", dim(Z)[1])
   
   cc3.weight.x <- matrix(ncol = 0, nrow = dim(X)[2])
   cc3.weight.y <- matrix(ncol = 0, nrow = dim(Y)[2])
@@ -58,12 +59,12 @@ getCCA3 <- function(X, Y, Z,
   
   dims <- c(dim(X)[2], dim(Y)[2], dim(Z)[2])
   
-  #determine pseudo matrix once - Z does not change
+  # determine pseudo matrix once - Z does not change
   if (abs(det(var(Z))) > 10 ^ -20) {
-    #if var(Z) is invertible
+    # if var(Z) is invertible
     Zp <- solve(var(Z)) %*% t(Z)
   } else{
-    Zp <- (diag(1 / sqrt(diag(var(Z))))) %*% t(Z)#otherwise: regularize
+    Zp <- (diag(1 / sqrt(diag(var(Z))))) %*% t(Z) # otherwise: regularize
   }
   
   
@@ -71,41 +72,37 @@ getCCA3 <- function(X, Y, Z,
   
   canVar = 1
   while (canVar <= numCV) {
-    #calculate the canonical variables
-    #normalize data matrices
+    # calculate the canonical variables
+    # normalize data matrices
     X <- apply(X, 2, function(y) {
       if (var(y) == 0)
         y - mean(y)
       else
         (y - mean(y)) / var(y)})
+    
     Y <- apply(Y, 2, function(y) {
       if (var(y) == 0)
         y - mean(y)
       else
         (y - mean(y)) / var(y)})
     
-    #determine Pseudomatrices for every can. corr. step, including ridge regression
-    Xp <- (diag(1 / sqrt(diag(var(
-      X
-    ))))) %*% t(X)#strong regularization
+    # determine Pseudomatrices for every canonical correlation step, 
+    # including ridge regression
+    Xp <- (diag(1 / sqrt(diag(var(X))))) %*% t(X) # strong regularization
     Yp <- (diag(1 / sqrt(diag(var(Y))))) %*% t(Y)
     
-    #Pseudomatrices * ...
+    # Pseudomatrices * ...
     XpZ <- Xp %*% Z
     YpZ <- Yp %*% Z
     ZpX <- Zp %*% X
     ZpY <- Zp %*% Y
     
-    
-    results <- get.best.lambdas(
-      X,
-      Y,
-      Z,
+    # get best combination of sparsity parameters
+    results <- get.best.lambdas(X, Y, Z,
       end = end,
       n.r = n.r,
       step = step,
-      max.counter.test = max.counter.test
-    )#return best combination of sparsity parameters
+      max.counter.test = max.counter.test) 
     
     if (is.null(results)) {
       break
@@ -114,30 +111,20 @@ getCCA3 <- function(X, Y, Z,
                  results$best.lambda.y,
                  results$best.lambda.z)
     corr.scca <- results$corr
+    
     xj <- results$bestVector[1:dims[1]]
     yj <- results$bestVector[(dims[1] + 1):(dims[1] + dims[2])]
-    zj <- results$bestVector[(dims[1] + dims[2] + 1):(dims[1] +
-                                                        dims[2] + dims[3])]
+    zj <- results$bestVector[(dims[1] + dims[2] + 1):(dims[1] + dims[2] + dims[3])]
     
-    
-    #update data matrices by removing the latent variable - only for X and Y
+    # update data matrices by removing the latent variable - only for X and Y
     zi <- Z %*% zj
     xi <- X %*% xj
-    reg <- apply(X, 2, function(x) {
-      lm(x ~ xi)
-    })
-    X <- sapply(reg, function(x) {
-      x[[2]]
-    })
+    reg <- apply(X, 2, function(x) {lm(x ~ xi)} )
+    X <- sapply(reg, function(x) {x[[2]]} )
     
     yi <- Y %*% yj
-    reg <- apply(Y, 2, function(x) {
-      lm(x ~ yi)
-    })
-    Y <- sapply(reg, function(x) {
-      x[[2]]
-    })
-    
+    reg <- apply(Y, 2, function(x) {lm(x ~ yi)} )
+    Y <- sapply(reg, function(x) {x[[2]]} )
     
     all.lambdas <- cbind(all.lambdas, lambdas)
     all.corr <- c(all.corr, corr.scca)
@@ -149,17 +136,15 @@ getCCA3 <- function(X, Y, Z,
     cc3.CV.z <- cbind(cc3.CV.z, zi)
     
     canVar <- canVar + 1
-  }#while canVar
+  } # while canVar
   
-  list(
-    cc3.weight.x = cc3.weight.x,
-    cc3.weight.y = cc3.weight.y,
-    cc3.weight.z = cc3.weight.z,
-    cc3.CV.x = cc3.CV.x,
-    cc3.CV.y = cc3.CV.y,
-    cc3.CV.z = cc3.CV.z,
-    corr = all.corr,
-    lambda = all.lambdas,
-    num.CV = numCV
-  )
+  return(list(cc3.weight.x = cc3.weight.x,
+              cc3.weight.y = cc3.weight.y,
+              cc3.weight.z = cc3.weight.z,
+              cc3.CV.x = cc3.CV.x,
+              cc3.CV.y = cc3.CV.y,
+              cc3.CV.z = cc3.CV.z,
+              corr = all.corr,
+              lambda = all.lambdas,
+              num.CV = numCV))
 }

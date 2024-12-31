@@ -15,5 +15,5 @@ comparePattern(x, y, dm = c("manhattan", "euklidean"))
 manhattan distance by default; other distances possible
 }
 \description{
-return manhattan distance by default; other distances possible
+return manhattan (default) or euklidean distance
 }

@@ -44,8 +44,9 @@ Z <- read.csv(system.file("arXiv.1405.1534", "SAMEG179892.csv", package = "spCCA
 # spCCA
 
 ```{r}
-
-CCA3 <- getCCA3(X=X, Y=Y, Z=Z, numCV=7)
+if(FALSE)
+CCA3 <- getCCA3(X=X, Y=Y, Z=Z, numCV=7,
+                max.counter.test=1)
 
 ```
 
