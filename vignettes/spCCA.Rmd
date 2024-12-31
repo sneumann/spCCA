@@ -55,9 +55,11 @@ Y <- completeObs(pcY)
 
 ```{r}
   CCA3 <- getCCA3(X=X, Y=Y, Z=Z, numCV=3)
-  plotCCA(CCA3, X, Y, filename = "/tmp/cca/cca", legend=c("metabolites", "genes", "design"))
 ```
 
+```{r}
+  plotCCA(CCA3, X, Y, filename = NULL, legend=c("metabolites", "genes", "design"))
+```
 
 
 

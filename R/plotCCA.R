@@ -5,7 +5,7 @@
 #' 
 #' @param CCA3 list with getCCA3() information to plot
 #' @param X,Y original biological data matrices without subtraction of canonical variables, for plots of top features
-#' @param filename CCA-project name as base output filename (_CV_numcv.pdf and _Top_numcv.pdf will be appended)
+#' @param filename If NULL, figures are plotted on screen, otherwise CCA-project name as base output filename (_CV_numcv.pdf and _Top_numcv.pdf will be appended)
 #' @param legend names of data sets X, Y, Z for legend, e.g. c("Genes", "Metabolites","Design Patterns")
 #'
 #' @return
@@ -13,7 +13,7 @@
 #' @author Andrea Thum
 #' @examples
 #' TRUE
-plotCCA <- function(CCA3, X, Y, filename, legend) {
+plotCCA <- function(CCA3, X, Y, filename=NULL, legend) {
   CV.X = CCA3$cc3.CV.x
   CV.Y = CCA3$cc3.CV.y
   CV.Z = CCA3$cc3.CV.z
@@ -52,7 +52,10 @@ plotCCA <- function(CCA3, X, Y, filename, legend) {
     for (i in 1:dim(CV.X)[1])
       pvy <- c(pvy, x.cv[i], x.cv[i])
     
-    pdf(paste(filename, "_CV_", numcv, ".pdf", sep = ""))
+    if (!is.null(filename)) {
+      pdf(paste(filename, "_CV_", numcv, ".pdf", sep = ""))
+    }
+    
     plot(pvx + 0.4,
          pvy,
          ylim = c(minyy, maxyy),
@@ -83,8 +86,11 @@ plotCCA <- function(CCA3, X, Y, filename, legend) {
            col = c("green", "blue", "red"),
            pch = rep(1, 3),
            lty = 1:2)
+
+    if (!is.null(filename)) {
+      dev.off()
+    }
     
-    dev.off()
     
     ######################################################
     #plot top features
@@ -119,8 +125,11 @@ plotCCA <- function(CCA3, X, Y, filename, legend) {
     pvx <- c()
     for (i in 1:dim(D3)[2])
       pvx <- c(pvx, i - 1, i)
+
+    if (!is.null(filename)) {
+      pdf(paste(filename, "_Top_", numcv, ".pdf", sep = ""))
+    }
     
-    pdf(paste(filename, "_Top_", numcv, ".pdf", sep = ""))
     plot(pvx + 0.3,
          pvy,
          ylim = c(minyy, maxyy),
@@ -155,6 +164,8 @@ plotCCA <- function(CCA3, X, Y, filename, legend) {
            pch = rep(1, length(c(plot1, plot2))),
            lty = 1:2)
     
-    dev.off()
+    if (!is.null(filename)) {
+      dev.off()
+    }
   }
 }

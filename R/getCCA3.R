@@ -24,7 +24,6 @@
 #' @param n.r number of resampling runs, 10 is okay
 #' @param max.counter.test number of random start vectors for iteration (inner loop)
 #' @param numCV number of canonical variables which will be calculated
-#' @param alpha control the regularization strength 
 #'
 #' @return A list with the elements 
 #'   cc3.weights.{xyz}: Matrices with weights of canonical variables for data set X, Y and Z respectively (columnwise)
@@ -46,8 +45,7 @@ getCCA3 <- function(X, Y, Z,
                     step = c(0.01, 0.01, 0.2),
                     numCV = 10,
                     n.r = 10,
-                    max.counter.test = 10,
-                    alpha=1) {
+                    max.counter.test = 10) {
   if (dim(X)[1] != dim(Y)[1] || dim(Y)[1] != dim(Z)[1])
     stop("X,Y,Z data matrices have different sample sizes: ", 
          dim(X)[1], " ", dim(Y)[1], " ", dim(Z)[1])
@@ -85,7 +83,7 @@ getCCA3 <- function(X, Y, Z,
     Zp <- ginv(var(Z)) %*% t(Z)
     
     } else{
-    Zp <- (diag(1 / sqrt(diag(var(Z)))) * alpha) %*% t(Z) # otherwise: regularize
+    Zp <- (diag(1 / sqrt(diag(var(Z))))) %*% t(Z) # otherwise: regularize
   }
   
   canVar = 1
@@ -106,8 +104,8 @@ getCCA3 <- function(X, Y, Z,
     
     # determine Pseudomatrices for every canonical correlation step, 
     # including ridge regression
-    Xp <- (diag(1 / sqrt(diag(var(X)))) * alpha) %*% t(X) # strong regularization
-    Yp <- (diag(1 / sqrt(diag(var(Y)))) * alpha) %*% t(Y)
+    Xp <- (diag(1 / sqrt(diag(var(X))))) %*% t(X) # strong regularization
+    Yp <- (diag(1 / sqrt(diag(var(Y))))) %*% t(Y)
     
     # Pseudomatrices * ...
     XpZ <- Xp %*% Z
