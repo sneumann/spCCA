@@ -289,21 +289,21 @@ get.best.lambdas <- function(X, Y, Z,
           
           cx <- canVarVector[j.lambda.x, j.lambda.y, j.lambda.z, 1:dims[1]]
           canVarVector[j.lambda.x, j.lambda.y, j.lambda.z, 1:dims[1]] <-
-            canVarVector[j.lambda.x, j.lambda.y, j.lambda.z, 1:dims[1]] / (sqrt(t(cx) %*% cx))
+            canVarVector[j.lambda.x, j.lambda.y, j.lambda.z, 1:dims[1]] / c(sqrt(t(cx) %*% cx))
           
           cy <- canVarVector[j.lambda.x, j.lambda.y, j.lambda.z, 
                              (dims[1] + 1):(dims[1] + dims[2])]
           canVarVector[j.lambda.x, j.lambda.y, j.lambda.z, 
                        (dims[1] + 1):(dims[1] + dims[2])] <- 
             canVarVector[j.lambda.x, j.lambda.y, j.lambda.z, 
-                         (dims[1] + 1):(dims[1] + dims[2])] / (sqrt(t(cy) %*% cy))
+                         (dims[1] + 1):(dims[1] + dims[2])] / c(sqrt(t(cy) %*% cy))
           
           cz <- canVarVector[j.lambda.x, j.lambda.y, j.lambda.z, 
                              (dims[1] + dims[2] + 1):(dims[1] + dims[2] + dims[3])]
           canVarVector[j.lambda.x, j.lambda.y, j.lambda.z, 
                        (dims[1] + dims[2] + 1):(dims[1] + dims[2] + dims[3])] <- 
             canVarVector[j.lambda.x, j.lambda.y, j.lambda.z, 
-                         (dims[1] + dims[2] + 1):(dims[1] + dims[2] + dims[3])] / (sqrt(t(cz) %*% cz))
+                         (dims[1] + dims[2] + 1):(dims[1] + dims[2] + dims[3])] / c(sqrt(t(cz) %*% cz))
         }
         
       } # lambda.z
