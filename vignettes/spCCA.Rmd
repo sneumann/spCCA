@@ -29,6 +29,7 @@ csl: biomed-central.csl
 
 ```{r LibraryPreload, echo=FALSE, results='hide'}
 library(spCCA)
+library(pcaMethods)
 ```
 
 # Introduction
@@ -41,6 +42,13 @@ See [@Hotel36].
 X <- read.csv(system.file("arXiv.1405.1534", "MTBLS18.csv", package = "spCCA"))
 Y <- read.csv(system.file("arXiv.1405.1534", "E-MTAB-3287.csv", package = "spCCA"))
 Z <- read.csv(system.file("arXiv.1405.1534", "SAMEG179892.csv", package = "spCCA"))
+
+pcX <- pca(X, nPcs=3, method="ppca")
+X <- completeObs(pcX)
+
+pcY <- pca(Y, nPcs=3, method="ppca")
+Y <- completeObs(pcY)
+
 ```
 
 # spCCA
@@ -48,8 +56,7 @@ Z <- read.csv(system.file("arXiv.1405.1534", "SAMEG179892.csv", package = "spCCA
 ```{r}
 if(FALSE) {
   # Examples from simulated data, not working for arXiv data :-( )
-  CCA3 <- getCCA3(X=X, Y=Y, Z=Z, numCV=7,
-                max.counter.test=1)
+  CCA3 <- getCCA3(X=X, Y=Y, Z=Z, numCV=3, max.counter.test=1, alpha=1)
 
   CCA3 <- getCCA3(X,Y,Z,numCV=2,  max.counter.test=1, n.r=1)
 }

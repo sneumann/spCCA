@@ -61,11 +61,13 @@ get.best.lambdas <- function(X, Y, Z,
   
   Xp <- (diag(1 / sqrt(diag(var(X))))) %*% t(X)#strong regularization
   Yp <- (diag(1 / sqrt(diag(var(Y))))) %*% t(Y)
-  if (abs(det(var(Z))) > 10 ^ -20)
-    Zp <- solve(var(Z)) %*% t(Z)
-  else
+  if (abs(det(var(Z))) > 10 ^ -20) {
+    #Zp <- solve(var(Z)) %*% t(Z)
+    Zp <- ginv(var(Z)) %*% t(Z)
+  } else {
     # if var(Z) is invertible
-    Zp <- (diag(1 / sqrt(diag(var(Z))))) %*% t(Z)#otherwise: regularize
+    Zp <- (diag(1 / sqrt(diag(var(Z))))) %*% t(Z) # otherwise: regularize
+  }
   
   # Pseudomatrices * ...
   XpZ <- Xp %*% Z
@@ -160,7 +162,8 @@ get.best.lambdas <- function(X, Y, Z,
     Yp.pred <- (diag(1 / sqrt(diag(var(y.predict ))))) %*% t(y.predict)
     
     if (abs(det(var(z.predict))) > 10 ^ -20) {
-      Zp.pred <- solve(var(z.predict)) %*% t(z.predict)  #if var(Z) is invertible
+      #Zp.pred <- solve(var(z.predict)) %*% t(z.predict)  #if var(Z) is invertible
+      Zp.pred <- ginv(var(z.predict)) %*% t(z.predict)  #if var(Z) is invertible
     } else{
       Zp.pred <- (diag(1 / sqrt(diag(var(z.predict))))) %*% t(z.predict) # otherwise: regularize
     }

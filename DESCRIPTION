@@ -3,7 +3,10 @@ Type: Package
 Title: supervised penalized CCA for three data sets (2 biological, 1 design)
 Version: 0.1.6
 Date: 2024-12-25
+Imports:
+    MASS
 Suggests: 
+    pcaMethods,
     testthat (>= 3.0.0),
     BiocStyle,
     knitr, 
