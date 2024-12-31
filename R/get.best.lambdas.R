@@ -1,25 +1,38 @@
-#' Title get.best.lambdas
+#' Calculate supervised CCA on three data matrices
 #' 
-#' as design data set Z is small, lambdas are higher and bigger steps can be used 
+#' Calculate correlation coefficients for sparse CCA for all combinations 
+#' of lambdas (using grid search).
+#' 
+#' Adequate numbers for the grid search depend on the data set size. 
+#' As a starting point 0.0 is recommended, this is equivalent to no sparsity. 
+#' Depending on the number of features, 
+#' for about 1000 features, as ending point 0.25 should be high enough, 
+#' for about 10 features it is more like 2. 
+#' For the step size 0.01 is a good number for sets with 1000 features, 0.1 for 10 features. 
+#' For a good resampling quality set n.r to about ten.
+#' The higher the number of random start vectors, the better. 
+#' Depending on the instability of the data set between 5 and 20 should be good.
+#' 
+#' As design data set Z is small, lambdas are higher and bigger steps can be used 
 #' for data set with about 1000 features, lambda.end=0.3 should be high enough; 
-#' use higher end values for smaller data sets and lower for bigger
+#' use higher end values for smaller data sets and lower for bigger data sets.
 #'
 #' @param X,Y,Z three data sets, Z is design data set, (STN: all three ?) already normalized to zero mean and variance 1
-#' @param start,end,step start, end and stepsize for lambda.{x,y,z}
+#' @param start,end,step start, end and stepsize for lambda.{x,y,z} grid search.
 #' @param n.r number of resampling steps
-#' @param max.counter.test number of trials with random start vectors (inner loop)
+#' @param max.counter.test number of random start vectors for iteration (inner loop)
 #'
 #' @return list with three components:
-#'       best.lambdas: best combination of sparsity parameters lambda{x,y,z} for given data sets
-#        corr: correlation for best weight vector
-#        bestVector: best weight vector
-
+#'       best.lambdas: optimal lambdas for the three data sets
+#        corr: best test set correlation for best vector
+#        bestVector: all three eigenvectors for x, y, z with best correlation concatenated
+#' 
 #' @export
 #' @importFrom stats var cor medien runif lm
 #' @importFrom graphics axis lines
 #' @importFrom grDevices dev.off pdf rainbow 
 #' 
-#'
+#' @author Andrea Thum, Elena Parkhomenko
 #' @examples
 #' TRUE
 get.best.lambdas <- function(X, Y, Z,

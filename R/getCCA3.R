@@ -1,7 +1,15 @@
-#' getCCA3
+#' Calculate supervised CCA on three data matrices
 #'
-#' The getCCA3() function performs # STN confirm: Copilot says: sparse 
-#' canonical correlation analysis on three data matrices (X, Y, Z). 
+#' getCCA3() starts the supervised sparse CCA 
+#' 
+#' 
+#' 
+#' 
+#' The getCCA3() function performs sparse 
+#' canonical correlation analysis on three data matrices 
+#' (two biological data sets X,Y, and one design data set Z) with elastic net. 
+#' Data sets X and Y are strongly regularized (ridge regression); Z if neccessary (det(Z)==0).
+#' 
 #' It normalizes the data matrices, computes canonical variables, 
 #' and updates the data matrices by removing the latent variables iteratively 
 #' for a specified number of canonical variables (numCV). 
@@ -9,15 +17,25 @@
 #' correlation coefficients, and optimal sparsity parameters (lambda values) 
 #' for each canonical variable.
 #' 
-#' @param X,Y,Z biological data sets X,Y; design data set Z 
-#' @param end,step,nr,max.counter.test passed to get.best.lambdas() # STN confirm: Copilot says: parameters for the optimization of the sparsity parameters 
-#' @param numCV number of canonical variables
+#' @param X biological data set with dim(X): n rows, p features
+#' @param Y biological data set with dim(Y): n rows, q features
+#' @param Z design data set with dim(Z): n rows, r features; describes experimental design with binary vectors
+#' @param end,step end and stepsize for lambda.{x,y,z} grid search.
+#' @param n.r number of resampling runs, 10 is okay
+#' @param max.counter.test number of random start vectors for iteration (inner loop)
+#' @param numCV number of canonical variables which will be calculated
 #'
 #' @return A list with the elements 
-#'   cc3.weights.{xyz}: matrices with weight vectors for each canonical variable (columnwise)
-#'   cc3.CV.{xyz}: matrices with canonical variables (columnwise)
+#'   cc3.weights.{xyz}: Matrices with weights of canonical variables for data set X, Y and Z respectively (columnwise)
+#'   cc3.CV.{xyz}: matrices with canonical variables for data set X, Y and Z respectively (columnwise)
 #'   corr: matrix with correlation coefficient for pairwise (X-Y,X-Z,YZ) and correlation of can. variable: sum(corr(X-Z),corr(Y-Z))/2 (columnwise)
-#'   lambda: best lambda.{xyz} for each can. var. (columnwise)
+#'         STN: contradictory documentation, corr could be: Vector with absolute correlation coefficients of canonical variables (columnwise): (corr(cv(X),cv(Z))+ corr(cv(Y),cv(Z))/2    
+#'   lambda: best lambda.{xyz} for each data set and for each can. var. (columnwise)
+#'   numCV: Number of canonical variables
+#'   
+#' @keywords supervised CCA sparse
+#' @author Andrea Thum
+#'  
 #' @export
 #'
 #' @examples
@@ -46,7 +64,6 @@ getCCA3 <- function(X, Y, Z,
   rownames(cc3.CV.y) <- rownames(X)
   rownames(cc3.CV.z) <- rownames(X)
   
-  
   all.lambdas <- matrix(ncol = 0, nrow = 3)
   all.corr <- c()
   
@@ -66,9 +83,6 @@ getCCA3 <- function(X, Y, Z,
   } else{
     Zp <- (diag(1 / sqrt(diag(var(Z))))) %*% t(Z) # otherwise: regularize
   }
-  
-  
-  
   
   canVar = 1
   while (canVar <= numCV) {

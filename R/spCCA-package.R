@@ -13,7 +13,8 @@
 #'   Steffen Neumann
 #'   Stefan Posch
 #' @maintainer Steffen Neumann <sneumann@ipb-halle.de>
-#' @references Please see https://arxiv.org/abs/1405.1534 for a manuscript describing spCCA.
+#' @references
+#'   [@Hotel36]
 #' @suggests testthat BiocStyle knitr rmarkdown BiocStyle
 #' @VignetteBuilder knitr 
 "_PACKAGE"

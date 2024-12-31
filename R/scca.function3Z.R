@@ -1,21 +1,27 @@
 #' Title scca.function3Z
 #' 
+#' Implements the modified iterative power method for three (regularized) data sets 
+#' with lasso penalty for given lasso parameters lambda.{x,y,z}.
+#' Pseudomatrices are used as input for faster calculation.
 #' This function is called by get.best.lambdas()
 #'
-#' @param XpZ,YpZ,ZpX,ZpY XpZ = regularized Pseudoinverse(X) * Z, analogously: YpZ, ZpX, ZpY with X,Y: biol. data sets; Z: design data set
-#' @param dims 
-#' @param lambda.x,lambda.y,lambda.z sparsity parameters for Data Sets X, Y, Z
+#' @param XpZ,YpZ,ZpX,ZpY For regularized pseudomatrix Xp of X: regularize(t(X)*X)) * t(X); then XpZ = Xp * Z is input. Z is the design data set.
+#' @param dims dims[1:3] number of features of data sets X, Y, Z
+#' @param lambda.x,lambda.y,lambda.z lasso parameters lambda for data sets. lambda = 0: no sparsity
 #' @param max.iter max. number of iterations for power method
-#' @param shift lasso-regularization after {shift} iterations
-#' @param x.initial,y.initial,z.initial may start with preset start vectors, if NULL: random
+#' @param shift start lasso regularization after shift iteration steps
+#' @param x.initial,y.initial,z.initial initial vectors for iteration. If NULL: filled with random values
 #'
 #' @return a list with the components:
 #'   {xyz}.new: eigenvectors, i.e. weight vectors for supervised sparse CCA for 3 data sets (X,Y;Z) and given sparsity (lambdas)
-#    i: number of iterations (should not be max.iter!)
-#    null: at least one sparsity parameter lambda is too strict: weight vector = (0,...,0)
-
+#    i: number of iterations until convergence (should not be max.iter!)
+#    null: true if at least one lambda is too high and all weights of one weight vector are zero}, i.e. at least one sparsity parameter lambda is too strict: weight vector = (0,...,0)
+#'
+#' @note Test output variable i, if iteration did converge (i<max.iter)!
 #' @importFrom stats cor lm median runif var
 #' @export
+#' @author Andrea Thum, Elena Parkhomenko
+#' @keywords CCA lasso
 #'
 #' @examples
 #' TRUE

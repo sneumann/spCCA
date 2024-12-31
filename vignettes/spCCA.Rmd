@@ -33,6 +33,8 @@ library(spCCA)
 
 # Introduction
 
+See [@Hotel36].
+
 # Datasets
 
 ```{r}
@@ -44,9 +46,13 @@ Z <- read.csv(system.file("arXiv.1405.1534", "SAMEG179892.csv", package = "spCCA
 # spCCA
 
 ```{r}
-if(FALSE)
-CCA3 <- getCCA3(X=X, Y=Y, Z=Z, numCV=7,
+if(FALSE) {
+  # Examples from simulated data, not working for arXiv data :-( )
+  CCA3 <- getCCA3(X=X, Y=Y, Z=Z, numCV=7,
                 max.counter.test=1)
+
+  CCA3 <- getCCA3(X,Y,Z,numCV=2,  max.counter.test=1, n.r=1)
+}
 
 ```
 

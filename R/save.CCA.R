@@ -1,12 +1,18 @@
 
-#' Save CCA3 results to (human reabable) file
+#' Save CCA3 results to (human readable) file
 #'
-#' @param CCA3 list with CCA3 information to save
-#' @param filename base output filename (_numcv.txt be appended)
+#' Store results of current canonical variable in a file. 
+#' First row: information about lambdas and correlation coefficients. 
+#' Next rows for all three data sets for each weight > 0 weight and feature name. 
+#' Weights are sorted in decreasing order, so most important features are on top.
+#' 
+#' @param CCA3 list with getCCA3() information to save
+#' @param filename CCA-project name as base output filename (_numcv.txt be appended)
 #'
 #' @return
 #' @export
 #'
+#' @author Andrea Thum
 #' @examples
 #' TRUE
 save.CCA <- function(CCA3, filename) {

@@ -1,15 +1,16 @@
 #' Plot CCA results to PDF file(s)
 #'
-#' Plot Canonical Variables and top features for each canonical variable
+#' Plot Canonical Variables and top two features for each canonical variable
 #' 
-#' @param CCA3 list with CCA3 information to plot
-#' @param X,Y 
-#' @param filename base output filename (_CV_numcv.pdf and _Top_numcv.pdf will be appended)
-#' @param legend e.g. c("Genes","Metabolites","Patterns")
+#' 
+#' @param CCA3 list with getCCA3() information to plot
+#' @param X,Y original biological data matrices without subtraction of canonical variables, for plots of top features
+#' @param filename CCA-project name as base output filename (_CV_numcv.pdf and _Top_numcv.pdf will be appended)
+#' @param legend names of data sets X, Y, Z for legend, e.g. c("Genes", "Metabolites","Design Patterns")
 #'
 #' @return
 #' @export
-#'
+#' @author Andrea Thum
 #' @examples
 #' TRUE
 plotCCA <- function(CCA3, X, Y, filename, legend) {

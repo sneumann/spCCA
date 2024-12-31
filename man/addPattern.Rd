@@ -2,27 +2,31 @@
 % Please edit documentation in R/spCCA_functions.R
 \name{addPattern}
 \alias{addPattern}
-\title{cluster weight vectors by assigning them to one pattern}
+\title{cluster weight vectors by assigning them to one pattern
+The addPattern function clusters weight vectors by assigning them to one pattern 
+in the given list. It checks if the mean cluster vector is similar to a new z.vector, 
+and makes a new cluster if not similar to any existing cluster, 
+counts the number of vectors associated with one cluster, 
+and saves the correlation for the cluster. 
+The function returns the updated list of patterns.}
 \usage{
 addPattern(List.Pattern, corr, xyz.vector, z.vector)
 }
 \arguments{
-\item{List.Pattern}{}
+\item{List.Pattern}{The list of existing patterns.}
 
-\item{corr}{}
+\item{corr}{(STN: LLM says:) The correlation value.}
 
-\item{xyz.vector}{}
+\item{xyz.vector}{(STN: LLM says:) The combined vector of x, y, and z-weight.}
 
-\item{z.vector}{}
+\item{z.vector}{The vector for comparison to find or create clusters}
+}
+\value{
+List of cluster items:
+  item [[1]]: correlation
+  item [[2]]: combined vector of x, y, and z-weight
+  item [[3]]: counter for number of vectors in cluster
 }
 \description{
-cluster weight vectors by assigning them to one pattern in list 
-if mean cluster vector is similar to new z.vector;
-make new cluster if not similar to any existing cluster
-count number of vectors associated to one cluster, 
-save correlation for cluster 
-cluster items:
-item [[1]]: correlation
-item [[2]]: combined vector of x, y, and z-weight
-item [[3]]: counter for number of vectors in cluster
+The addPattern function is called within the get.best.lambdas
 }
