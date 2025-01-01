@@ -29,7 +29,6 @@ csl: biomed-central.csl
 
 ```{r LibraryPreload, echo=FALSE, results='hide'}
 library(spCCA)
-library(pcaMethods)
 ```
 
 # Introduction
@@ -38,23 +37,73 @@ See [@Hotel36].
 
 # Datasets
 
+We reduced the data sets by excluding features with low variance 
+(threshold chosen σ < 1 for genes and σ < 0.4 for metabolites), 
+resulting in a 72 × 252 LC/MS signal intensity matrix (X), 
+and a 72 × 1277 gene expression matrix (Y).
+
 ```{r}
-X <- read.csv(system.file("arXiv.1405.1534", "MTBLS18.csv", package = "spCCA"))
-Y <- read.csv(system.file("arXiv.1405.1534", "E-MTAB-3287.csv", package = "spCCA"))
-Z <- read.csv(system.file("arXiv.1405.1534", "SAMEG179892.csv", package = "spCCA"))
+MTBLS18_path <- system.file("arXiv.1405.1534", "MTBLS18.csv", 
+                            package = "spCCA")
+EMTAB3287_path <- system.file("arXiv.1405.1534", "E-MTAB-3287.csv", 
+                                package = "spCCA")
+SAMEG179892_path <- system.file("arXiv.1405.1534", "SAMEG179892.csv", 
+                                    package = "spCCA")
 
-pcX <- pca(X, nPcs=3, method="ppca")
-X <- completeObs(pcX)
+X <- as.matrix(read.csv(MTBLS18_path, row.names = 1))
+Y <- as.matrix(read.csv(EMTAB3287_path, row.names = 1))
+Z <- as.matrix(read.csv(SAMEG179892_path, row.names = 1))
 
-pcY <- pca(Y, nPcs=3, method="ppca")
-Y <- completeObs(pcY)
+```
+
+## Data visualisation
+
+Show a graphical representation of the experimental design factors. 
+Then, check the distribution of values in the biological data sets. 
+
+TODO: double check x position of the samples and actual factor levels 
+for the experiments/samples.
+
+```{r}
+
+plot(Z[,"DayNight"]*0.9, main="Experimental Design Factors", type="s", 
+     xlab="Sample", ylab="",
+     ylim=c(0,ncol(Z)), xaxt="n", yaxt="n")
+axis(1, at=seq(0, along=rownames(X)), labels=rownames(X), 
+     las=2, cex.axis=1/(nrow(Z)/25))
+axis(2, at=seq(0, along=colnames(Z)), labels=colnames(Z), 
+     las=2, cex.axis=0.6)
+
+abline(v=seq(6.5, along=rownames(X), by=6), col="grey", lty=2)
+abline(v=seq(12.5, along=rownames(X), by=12), col="grey", lty=1)
+
+i<-0
+dummy <- sapply(colnames(Z), function(f) { lines(Z[,f]*0.9+i, col=i, type="s"); i<<-i+1 })
+
+hist(X, freq=FALSE, main="Metabolites", xlab="Intensity", ylab="Density")
+lines(density(X), col="blue")
+
+hist(Y, freq=FALSE, main="Transcripts", xlab="Intensity", ylab="Density")
+lines(density(Y), col="blue")
+
+
 
 ```
 
 # spCCA
 
+
+Unsure how to perform the "ten-fold repeated hold-out sampling" mentioned in the paper. 
+
+
 ```{r}
-  CCA3 <- getCCA3(X=X, Y=Y, Z=Z, numCV=3)
+# Define the grid size
+end <- c(16, 21, 31)
+step <- c(1, 1, 1)  # Adjust step size if necessary
+
+CCA3 <- getCCA3(X=X, Y=Y, Z=Z, numCV=9)  
+
+#CCA3 <- getCCA3(X=X, Y=Y, Z=Z, numCV=9, end=end, step=step)
 ```
 
 ```{r}

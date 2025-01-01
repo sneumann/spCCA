@@ -6,7 +6,6 @@ Date: 2024-12-25
 Imports:
     MASS
 Suggests: 
-    pcaMethods,
     testthat (>= 3.0.0),
     BiocStyle,
     knitr, 

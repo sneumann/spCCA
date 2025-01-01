@@ -190,15 +190,12 @@ get.best.lambdas <- function(X, Y, Z,
     
   } # while k
   
-  #now cross-val
-  for (j.lambda.y in 1:n.lambdas.y)
-  {
+  # now cross-validate
+  for (j.lambda.y in 1:n.lambdas.y) {
     lambda.y <- lambda.y.seq[j.lambda.y]
-    for (j.lambda.x in 1:n.lambdas.x)
-    {
+    for (j.lambda.x in 1:n.lambdas.x) {
       lambda.x <- lambda.x.seq[j.lambda.x]
-      for (j.lambda.z in 1:n.lambdas.z)
-      {
+      for (j.lambda.z in 1:n.lambdas.z) {
         lambda.z <- lambda.z.seq[j.lambda.z]
         if (is.na(test.corr.scca[j.lambda.x, j.lambda.y, j.lambda.z]))
           next

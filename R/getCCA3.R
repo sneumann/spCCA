@@ -10,7 +10,8 @@
 #' (two biological data sets X,Y, and one design data set Z) with elastic net. 
 #' Data sets X and Y are strongly regularized (ridge regression); Z if neccessary (det(Z)==0).
 #' 
-#' It normalizes the data matrices, computes canonical variables, 
+#' The getCCA3 first normalizes the data matrices (column-wise mean centering and unit variance), 
+#' computes canonical variables, 
 #' and updates the data matrices by removing the latent variables iteratively 
 #' for a specified number of canonical variables (numCV). 
 #' It returns a list containing matrices with weight vectors and canonical variables, 
