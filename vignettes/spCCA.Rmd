@@ -29,8 +29,11 @@ csl: biomed-central.csl
 
 ```{r LibraryPreload, echo=FALSE, results='hide'}
 library(spCCA)
+library(tidyverse)
+library(ggplot2)
 library(knitr)
 library(kableExtra)
+
 ```
 
 # Introduction
@@ -52,9 +55,18 @@ EMTAB3287_path <- system.file("arXiv.1405.1534", "E-MTAB-3287.csv",
 SAMEG179892_path <- system.file("arXiv.1405.1534", "SAMEG179892.csv", 
                                     package = "spCCA")
 
+## Nicer order of the design factors 
+classorder <- rev(c("Pinf",
+                "GL1","Pen2Alone","Erp1","Erp2","D",
+                "DayNight",
+                "Replicate2","Replicate3","Pinf.Culture3","Pinf.Culture2"))
+
 X <- as.matrix(read.csv(MTBLS18_path, row.names = 1))
 Y <- as.matrix(read.csv(EMTAB3287_path, row.names = 1))
-Z <- as.matrix(read.csv(SAMEG179892_path, row.names = 1))
+Z <- as.matrix(read.csv(SAMEG179892_path, row.names = 1))[,classorder]
+
+## Enforce same sample names, re-using Metabolomics sample names
+rownames(Z) <- rownames(Y) <- rownames(X)
 
 ```
 
@@ -97,19 +109,15 @@ lines(density(Y), col="blue")
 
 Unsure how to perform the "ten-fold repeated hold-out sampling" mentioned in the paper. 
 
-
 ```{r getCCA3, cache=TRUE}
-
-# Define the grid size based on paper
-end  <- c(16, 21, 31)
-step <- c( 1,  1,  1)
+numCV <- 6 # number of canonical variables to calculate
 
 # Define the grid size based on manpage
 end  <- c(1.0,  0.2,  2.0)
 step <- c(0.05, 0.01, 0.1)
 
 CCA3 <- getCCA3(X=X, Y=Y, Z=Z, 
-                numCV=6,
+                numCV=numCV,
                 end=end, step=step,
                 n.r = 5, ## number of repeats, increase to 10 when parameters are stable
                 max.counter.test = 5 ## number of random start vectors for iteration, increase to 10-20 when parameters are stable
@@ -138,6 +146,26 @@ For the design matrix with n=11 design factors, a step size of 0.1 could be a go
 
 step size 0.01 is a good number for sets with 1000 features
 
+## Correlation of canonical variables
+
+The correlation of the canonical variables is a measure how well 
+the experimental design explains the experimental data. 
+A sharp drop in the values can be a hint to use fewer canonical variables.
+
+Unsure where to get significance threshold, 
+must be somewhere in `get.best.lambdas()`.
+
+```{r}
+  #plot(CCA3$corr, type="l")
+ggplot(data=data.frame(x=seq(along=CCA3$corr), y=CCA3$corr), 
+       mapping=aes(x = x, y = y)) +
+  geom_line() +
+  geom_point()
+
+```
+
+
+
 ```{r}
   plotCCA(CCA3, X, Y, filename = NULL, legend=c("metabolites", "genes", "design"))
 ```
@@ -148,13 +176,123 @@ step size 0.01 is a good number for sets with 1000 features
 numCV <- 1
 topN <- 1:10
 
-kables(list(
-kable(CCA3$cc3.weight.z[order(abs(CCA3$cc3.weight.z[,numCV]), decreasing=TRUE)[topN], numCV]) %>% kable_styling(),
-kable(CCA3$cc3.weight.x[order(abs(CCA3$cc3.weight.x[,numCV]), decreasing=TRUE)[topN], numCV]) %>% kable_styling(),
-kable(CCA3$cc3.weight.y[order(abs(CCA3$cc3.weight.y[,numCV]), decreasing=TRUE)[topN], numCV]) %>% kable_styling()
-)) 
+kable(CCA3$cc3.weight.z[order(abs(CCA3$cc3.weight.z[,numCV]), decreasing=TRUE)[topN], numCV],
+      digits=3) %>% kable_styling(full_width = F, position = "left")
+kable(CCA3$cc3.weight.x[order(abs(CCA3$cc3.weight.x[,numCV]), decreasing=TRUE)[topN], numCV],
+      digits=3) %>% kable_styling(full_width = F, position = "center")
+kable(CCA3$cc3.weight.y[order(abs(CCA3$cc3.weight.y[,numCV]), decreasing=TRUE)[topN], numCV],
+      digits=3) %>% kable_styling(full_width = F, position = "right")
 
 ```
+
+## Join the tidyverse
+
+```{r}
+# Combine the lists into a single data frame
+
+canVars = as.tibble(cbind(canVar=seq(along=CCA3$corr), corr = CCA3$corr))
+
+lambdas <- data.frame(matrix=c("X", "Y", "Z")[seq_along(rownames(CCA3$lambda))],
+                 CCA3$lambda)
+colnames(lambdas) <- c("matrix", seq(1,ncol(lambdas)-1))
+
+# convert lambdas from wide to long tibble
+lambdas_long <- pivot_longer(as_tibble(lambdas), 
+                             cols=seq(2,ncol(lambdas)),
+                             names_to="canVar",
+                             names_transform = list(canVar = as.integer),
+                             values_to="lambda")
+
+
+# Convert the data frame to a tibble
+combined_tibble <- inner_join(canVars, lambdas_long, by="canVar")
+
+# Print the tibble
+print(combined_tibble)
+
+``` 
+
+
+## Join the tidyverse
+
+```{r}
+
+canVarX <- data.frame(matrix="X", sampleName=rownames(CCA3$cc3.CV.x), CCA3$cc3.CV.x)
+colnames(canVarX) <- c("matrix", "sampleName", seq(1,ncol(canVarX)-2))
+
+canVarY <- data.frame(matrix="Y", sampleName=rownames(CCA3$cc3.CV.y), CCA3$cc3.CV.y)
+colnames(canVarY) <- c("matrix", "sampleName", seq(1,ncol(canVarY)-2))
+
+canVarZ <- data.frame(matrix="Z", sampleName=rownames(CCA3$cc3.CV.z), CCA3$cc3.CV.z)
+colnames(canVarZ) <- c("matrix", "sampleName", seq(1,ncol(canVarZ)-2))
+
+canVar <- rbind(canVarX, canVarY, canVarZ)
+
+canVar_long <- pivot_longer(as.tibble(canVar),
+                             cols=seq(3,ncol(canVar)),
+                        names_to="canVar",
+                        names_transform = list(canVar = as.integer))
+
+## ggplot canVar_long for each matrix for canVar==1
+ggplot(data=canVar_long %>% filter(canVar==1), 
+       mapping=aes(x = sampleName, y = value, color=matrix, group=matrix)) +
+  geom_line() +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+``` 
+
+
+## Join the tidyverse
+
+```{r}
+
+weightsX <- data.frame(matrix="X", featureName=rownames(CCA3$cc3.weight.x), CCA3$cc3.weight.x)
+colnames(weightsX) <- c("matrix", "featureName", seq(1,ncol(weightsX)-2))
+
+weightsY <- data.frame(matrix="Y", featureName=rownames(CCA3$cc3.weight.y), CCA3$cc3.weight.y)
+colnames(weightsY) <- c("matrix", "featureName", seq(1,ncol(weightsY)-2))
+
+weightsZ <- data.frame(matrix="Z", featureName=rownames(CCA3$cc3.weight.z), CCA3$cc3.weight.z)
+colnames(weightsZ) <- c("matrix", "featureName", seq(1,ncol(weightsZ)-2))
+
+weights <- rbind(weightsX, weightsY, weightsZ)
+
+weights_long <- pivot_longer(as.tibble(weights),
+                             cols=seq(3,ncol(weights)),
+                        names_to="canVar",
+                        names_transform = list(canVar = as.integer))
+
+values <- as.tibble(bind_rows(data.frame(matrix="X", featureName=colnames(X), t(X)),
+                  data.frame(matrix="Y", featureName=colnames(Y), t(Y)),
+                data.frame(matrix="Z", featureName=colnames(Z), t(Z))))
+
+
+values_long <- pivot_longer(values,
+                             cols=seq(3,ncol(values)),
+                             names_to="sampleName")
+
+## for each matrix, for each canVar, obtain the featureNames of the features with the hightest weights
+topN <- 2
+topFeatures <- weights_long %>% filter(matrix != "Z") %>%
+  group_by(matrix, canVar) %>% 
+  top_n(topN, abs(value)) %>% 
+  arrange(matrix, canVar, desc(abs(value)))
+
+## for Each topFeature, multiply the corresponding value_long with the weight
+topFeatures_values <- inner_join(topFeatures %>% filter(canVar==1), 
+                                 values_long, by=c("matrix", "featureName")) %>% 
+  mutate(weightedValue = value.x*value.y)
+
+## ggplot topFeatures_values for each matrix for canVar==1
+ggplot(data=topFeatures_values, 
+       mapping=aes(x = sampleName, y = weightedValue, color=featureName, group=featureName)) +
+  geom_line() +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+``` 
+
 
 ## Saving results
 
