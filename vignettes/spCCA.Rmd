@@ -29,6 +29,8 @@ csl: biomed-central.csl
 
 ```{r LibraryPreload, echo=FALSE, results='hide'}
 library(spCCA)
+library(knitr)
+library(kableExtra)
 ```
 
 # Introduction
@@ -96,21 +98,69 @@ lines(density(Y), col="blue")
 Unsure how to perform the "ten-fold repeated hold-out sampling" mentioned in the paper. 
 
 
-```{r}
-# Define the grid size
-end <- c(16, 21, 31)
-step <- c(1, 1, 1)  # Adjust step size if necessary
+```{r getCCA3, cache=TRUE}
 
-CCA3 <- getCCA3(X=X, Y=Y, Z=Z, numCV=9)  
+# Define the grid size based on paper
+end  <- c(16, 21, 31)
+step <- c( 1,  1,  1)
+
+# Define the grid size based on manpage
+end  <- c(1.0,  0.2,  2.0)
+step <- c(0.05, 0.01, 0.1)
+
+CCA3 <- getCCA3(X=X, Y=Y, Z=Z, 
+                numCV=6,
+                end=end, step=step,
+                n.r = 5, ## number of repeats, increase to 10 when parameters are stable
+                max.counter.test = 5 ## number of random start vectors for iteration, increase to 10-20 when parameters are stable
+                )  
 
 #CCA3 <- getCCA3(X=X, Y=Y, Z=Z, numCV=9, end=end, step=step)
 ```
+
+The higher the lambdas, the more sparse the canonical variables will be.
+
+The parameters for the lambda grid search depend on the number of features (rows) 
+in the data matrices. 
+
+The end value is inverse proportional to the number of features.
+For the metabolomics data with n=252 rows, an end value of 1.0 could be a good value.
+For the transcriptomics data with n=1277 rows, an end value of 0.2 could be a good value.
+For the design matrix with n=11 design factors, an end value of 2.0 could be a good value.
+
+
+The step size is inverse proportional to the number of features.
+For the metabolomics data with n=252 rows, a step size of 0.05 could be a good value.
+For the transcriptomics data with n=1277 rows, a step size of 0.01 or slightly 
+smaller is a good value.
+For the design matrix with n=11 design factors, a step size of 0.1 could be a good value.
+
+
+step size 0.01 is a good number for sets with 1000 features
 
 ```{r}
   plotCCA(CCA3, X, Y, filename = NULL, legend=c("metabolites", "genes", "design"))
 ```
 
+## Details of canonical variables
 
+```{r}
+numCV <- 1
+topN <- 1:10
+
+kables(list(
+kable(CCA3$cc3.weight.z[order(abs(CCA3$cc3.weight.z[,numCV]), decreasing=TRUE)[topN], numCV]) %>% kable_styling(),
+kable(CCA3$cc3.weight.x[order(abs(CCA3$cc3.weight.x[,numCV]), decreasing=TRUE)[topN], numCV]) %>% kable_styling(),
+kable(CCA3$cc3.weight.y[order(abs(CCA3$cc3.weight.y[,numCV]), decreasing=TRUE)[topN], numCV]) %>% kable_styling()
+)) 
+
+```
+
+## Saving results
+
+```{r}
+save.CCA(CCA3, file="CCA3")
+```
 
 
 # References {.unnumbered}
