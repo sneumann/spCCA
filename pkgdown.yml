@@ -3,5 +3,8 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   spCCA: spCCA.html
-last_built: 2025-01-09T16:13Z
+last_built: 2025-01-09T19:48Z
+urls:
+  reference: https://sneumann.github.io/spCCA/reference
+  article: https://sneumann.github.io/spCCA/articles
 

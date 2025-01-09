@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://sneumann.github.io/spCCA/404.html</loc>
   </url>
   <url>
-    <loc>/articles/index.html</loc>
+    <loc>https://sneumann.github.io/spCCA/articles/index.html</loc>
   </url>
   <url>
-    <loc>/articles/spCCA.html</loc>
+    <loc>https://sneumann.github.io/spCCA/articles/spCCA.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://sneumann.github.io/spCCA/authors.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://sneumann.github.io/spCCA/index.html</loc>
   </url>
   <url>
-    <loc>/reference/addPattern.html</loc>
+    <loc>https://sneumann.github.io/spCCA/reference/addPattern.html</loc>
   </url>
   <url>
-    <loc>/reference/comparePattern.html</loc>
+    <loc>https://sneumann.github.io/spCCA/reference/comparePattern.html</loc>
   </url>
   <url>
-    <loc>/reference/get.best.lambdas.html</loc>
+    <loc>https://sneumann.github.io/spCCA/reference/get.best.lambdas.html</loc>
   </url>
   <url>
-    <loc>/reference/getCCA3.html</loc>
+    <loc>https://sneumann.github.io/spCCA/reference/getCCA3.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://sneumann.github.io/spCCA/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/plotCCA.html</loc>
+    <loc>https://sneumann.github.io/spCCA/reference/plotCCA.html</loc>
   </url>
   <url>
-    <loc>/reference/save.CCA.html</loc>
+    <loc>https://sneumann.github.io/spCCA/reference/save.CCA.html</loc>
   </url>
   <url>
-    <loc>/reference/scca.function3Z.html</loc>
+    <loc>https://sneumann.github.io/spCCA/reference/scca.function3Z.html</loc>
   </url>
   <url>
-    <loc>/reference/spCCA-package.html</loc>
+    <loc>https://sneumann.github.io/spCCA/reference/spCCA-package.html</loc>
   </url>
 </urlset>

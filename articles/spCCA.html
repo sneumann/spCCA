@@ -4,63 +4,60 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="spCCA">
 <title>Supervised Penalized Canonical Correlation Analysis with the spCCA package • spCCA</title>
-<!-- jquery --><script src="file:///usr/share/javascript/jquery/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="file:///usr/share/javascript/bootstrap/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
-<script src="file:///usr/share/javascript/bootstrap/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
-<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<script src="../deps/jquery-3.6.1/jquery-3.6.1.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Supervised Penalized Canonical Correlation Analysis with the spCCA package">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Supervised Penalized Canonical Correlation Analysis with the spCCA package">
 <meta property="og:description" content="spCCA">
 <!-- mathjax --><script src="file:///usr/share/javascript/mathjax/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body data-spy="scroll" data-target="#toc">
+<body>
+    <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <div class="container template-article">
-      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">spCCA</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.6</span>
-      </span>
-    </div>
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    
+    <a class="navbar-brand me-2" href="../index.html">spCCA</a>
 
-    <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-<li>
-  <a href="../articles/spCCA.html">Get started</a>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
+
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar" class="collapse navbar-collapse ms-3">
+      <ul class="navbar-nav me-auto">
+<li class="active nav-item">
+  <a class="nav-link" href="../articles/spCCA.html">Get started</a>
 </li>
-<li>
-  <a href="../reference/index.html">Reference</a>
+<li class="nav-item">
+  <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<form class="form-inline my-2 my-lg-0" role="search">
+        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
+</form>
+
+      <ul class="navbar-nav"></ul>
 </div>
-<!--/.nav-collapse -->
+
+    
   </div>
-<!--/.container -->
-</div>
-<!--/.navbar -->
+</nav><div class="container template-article">
 
-      
 
-      </header><script src="spCCA_files/kePrint-0.0.1/kePrint.js"></script><link href="spCCA_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+<script src="spCCA_files/kePrint-0.0.1/kePrint.js"></script><link href="spCCA_files/lightable-0.0.1/lightable.css" rel="stylesheet">
 <div class="row">
-  <div class="col-md-9 contents">
-    <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Supervised Penalized Canonical Correlation
-Analysis with the spCCA package</h1>
+  <main id="main" class="col-md-9"><div class="page-header">
+      <img src="" class="logo" alt=""><h1>Supervised Penalized Canonical Correlation Analysis with the spCCA package</h1>
                         <h4 data-toc-skip class="author">Andrea
 Thum</h4>
                   <a class="author_email" href="mailto:#"></a><a href="mailto:andrea.thum@informatik.uni-halle.de" class="email">andrea.thum@informatik.uni-halle.de</a>
@@ -72,8 +69,7 @@ Neumann</h4>
                   
       
       
-      <div class="hidden name"><code>spCCA.Rmd</code></div>
-
+      <div class="d-none name"><code>spCCA.Rmd</code></div>
     </div>
 
     
@@ -248,7 +244,7 @@ x
 Pinf
 </td>
 <td style="text-align:right;">
-0.679
+0.696
 </td>
 </tr>
 <tr>
@@ -256,7 +252,7 @@ Pinf
 Erp2
 </td>
 <td style="text-align:right;">
-0.464
+0.509
 </td>
 </tr>
 <tr>
@@ -264,7 +260,7 @@ Erp2
 Pinf.Culture2
 </td>
 <td style="text-align:right;">
-0.374
+0.275
 </td>
 </tr>
 <tr>
@@ -272,15 +268,7 @@ Pinf.Culture2
 Pinf.Culture3
 </td>
 <td style="text-align:right;">
-0.258
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Pen2Alone
-</td>
-<td style="text-align:right;">
-0.233
+0.269
 </td>
 </tr>
 <tr>
@@ -288,7 +276,15 @@ Pen2Alone
 Erp1
 </td>
 <td style="text-align:right;">
-0.231
+0.236
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pen2Alone
+</td>
+<td style="text-align:right;">
+0.221
 </td>
 </tr>
 <tr>
@@ -296,7 +292,7 @@ Erp1
 DayNight
 </td>
 <td style="text-align:right;">
-0.095
+0.065
 </td>
 </tr>
 <tr>
@@ -342,7 +338,15 @@ x
 M217T285
 </td>
 <td style="text-align:right;">
-0.294
+0.311
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M249T195
+</td>
+<td style="text-align:right;">
+0.298
 </td>
 </tr>
 <tr>
@@ -363,18 +367,10 @@ M201T406
 </tr>
 <tr>
 <td style="text-align:left;">
-M249T195
+M307T215
 </td>
 <td style="text-align:right;">
-0.277
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-M217T326
-</td>
-<td style="text-align:right;">
-0.262
+0.273
 </td>
 </tr>
 <tr>
@@ -382,15 +378,15 @@ M217T326
 M144T409
 </td>
 <td style="text-align:right;">
-0.246
+0.253
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-M307T215
+M217T326
 </td>
 <td style="text-align:right;">
-0.237
+0.249
 </td>
 </tr>
 <tr>
@@ -398,15 +394,7 @@ M307T215
 M321T229
 </td>
 <td style="text-align:right;">
-0.236
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-M391T510
-</td>
-<td style="text-align:right;">
-0.223
+0.234
 </td>
 </tr>
 <tr>
@@ -414,7 +402,15 @@ M391T510
 M155T236
 </td>
 <td style="text-align:right;">
-0.223
+0.227
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+M391T510
+</td>
+<td style="text-align:right;">
+0.221
 </td>
 </tr>
 </tbody>
@@ -444,7 +440,7 @@ X263948_at
 X267567_at
 </td>
 <td style="text-align:right;">
-0.103
+0.101
 </td>
 </tr>
 <tr>
@@ -452,47 +448,7 @@ X267567_at
 X249481_at
 </td>
 <td style="text-align:right;">
-0.101
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-X253343_at
-</td>
-<td style="text-align:right;">
 0.099
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-X261005_at
-</td>
-<td style="text-align:right;">
-0.098
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-X258277_at
-</td>
-<td style="text-align:right;">
-0.097
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-X261021_at
-</td>
-<td style="text-align:right;">
-0.096
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-X259403_at
-</td>
-<td style="text-align:right;">
-0.096
 </td>
 </tr>
 <tr>
@@ -500,15 +456,55 @@ X259403_at
 X253099_s_at
 </td>
 <td style="text-align:right;">
+0.095
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+X258277_at
+</td>
+<td style="text-align:right;">
+0.095
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+X261005_at
+</td>
+<td style="text-align:right;">
+0.095
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+X266267_at
+</td>
+<td style="text-align:right;">
+0.095
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+X261021_at
+</td>
+<td style="text-align:right;">
+0.094
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+X261216_at
+</td>
+<td style="text-align:right;">
 0.093
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-X251847_at
+X259403_at
 </td>
 <td style="text-align:right;">
-0.093
+0.092
 </td>
 </tr>
 </tbody>
@@ -548,24 +544,24 @@ X251847_at
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 18 × 4</span></span></span>
 <span><span class="co">##    canVar  corr matrix lambda</span></span>
 <span><span class="co">##     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>      1 0.947 X        0.25</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>      1 0.947 Y        0.07</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>      1 0.947 Z        0.1 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>      2 0.954 X        0.2 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>      2 0.954 Y        0.09</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>      2 0.954 Z        0   </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>      3 0.951 X        0.2 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>      3 0.951 Y        0.08</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>      3 0.951 Z        0.2 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>      4 0.897 X        0.2 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">11</span>      4 0.897 Y        0.1 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">12</span>      4 0.897 Z        0.1 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">13</span>      5 0.823 X        0   </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">14</span>      5 0.823 Y        0.11</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">15</span>      5 0.823 Z        0.1 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">16</span>      6 0.864 X        0.3 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">17</span>      6 0.864 Y        0.1 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">18</span>      6 0.864 Z        0.4</span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>      1 0.945 X        0.25</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>      1 0.945 Y        0.07</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>      1 0.945 Z        0.1 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>      2 0.956 X        0.2 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>      2 0.956 Y        0.09</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>      2 0.956 Z        0   </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>      3 0.939 X        0.2 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>      3 0.939 Y        0.08</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>      3 0.939 Z        0.2 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>      4 0.895 X        0.2 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>      4 0.895 Y        0.1 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>      4 0.895 Z        0.1 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">13</span>      5 0.829 X        0.2 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">14</span>      5 0.829 Y        0.14</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">15</span>      5 0.829 Z        0   </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">16</span>      6 0.865 X        0.3 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">17</span>      6 0.865 Y        0.1 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">18</span>      6 0.865 Z        0.4</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="join-the-tidyverse-1">Join the tidyverse<a class="anchor" aria-label="anchor" href="#join-the-tidyverse-1"></a>
@@ -713,33 +709,26 @@ X251847_at
 </div>
 </div>
 </div>
-  </div>
-
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
-
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
 
-      <footer><div class="copyright">
+    <footer><div class="pkgdown-footer-left">
   <p></p>
 <p>Developed by Steffen Neumann.</p>
 </div>
 
-<div class="pkgdown">
+<div class="pkgdown-footer-right">
   <p></p>
 <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
-      </footer>
+    </footer>
 </div>
 
   
-
 
   
 
