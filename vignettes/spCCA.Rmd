@@ -236,7 +236,7 @@ canVar_long <- pivot_longer(as.tibble(canVar),
 ## ggplot canVar_long for each matrix for canVar==1
 ggplot(data=canVar_long %>% filter(canVar==1), 
        mapping=aes(x = sampleName, y = value, color=matrix, group=matrix)) +
-  geom_line() +
+  geom_step(direction = "mid") +
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
@@ -287,7 +287,7 @@ topFeatures_values <- inner_join(topFeatures %>% filter(canVar==1),
 ## ggplot topFeatures_values for each matrix for canVar==1
 ggplot(data=topFeatures_values, 
        mapping=aes(x = sampleName, y = weightedValue, color=featureName, group=featureName)) +
-  geom_line() +
+  geom_step(direction = "mid") +
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
