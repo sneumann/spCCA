@@ -8,7 +8,7 @@ Imports:
 Suggests: 
     testthat (>= 3.0.0),
     BiocStyle,
-    knitr, kableExtra, ggplot2, tidyverse
+    knitr, kableExtra, ggplot2, tidyverse,
     rmarkdown
 Author: Andrea Thum, Steffen Neumann, Stefan Posch
 Author@R: c(person("Andrea", "Thum", role = "cre", email="andrea.thum@informatik.uni-halle.de"),
