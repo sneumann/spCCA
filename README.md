@@ -2,7 +2,7 @@
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![R-CMD-check-bioc](https://github.com/sneumann/spCCA/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/sneumann/spCCA/actions?query=workflow%3AR-CMD-check-bioc)
-[![license](https://img.shields.io/badge/license-Artistic--2.0-brightgreen.svg)](https://opensource.org/licenses/Artistic-2.0)
+[![GitHub License](https://img.shields.io/github/license/sneumann/spCCA)](https://opensource.org/license/gpl-2-0)
 
 The spCCA package combines sparse (penalized) CCA for two biological data sets 
   with a third data set, the experimental design and tries to find correlations 
