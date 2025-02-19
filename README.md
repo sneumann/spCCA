@@ -1,4 +1,6 @@
-# Low level infrastructure to handle MS spectra
+# supervised penalized CCA for three data sets (2 biological, 1 design)
+
+[//]: # ( [![Project Status: Inactive – The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive) )
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![R-CMD-check-bioc](https://github.com/sneumann/spCCA/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/sneumann/spCCA/actions?query=workflow%3AR-CMD-check-bioc)
