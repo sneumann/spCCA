@@ -13,21 +13,29 @@
 #' @author Andrea Thum
 #' @examples
 #' TRUE
-plotCCA <- function(CCA3, X, Y, filename=NULL, legend) {
+plotCCA <- function(CCA3, X, Experiments = NULL, filename=NULL, legend) {
+  if (length(legend) != length(X)+1)
+    stop("Length of legend must match the total number of datasets")
   CV.X = CCA3$cc3.CV.x
-  CV.Y = CCA3$cc3.CV.y
   CV.Z = CCA3$cc3.CV.z
 
-  numberCanVar <- dim(CV.X)[2] # number of can. variables
+  numberCanVar <- dim(CV.X[[1]])[2] # number of can. variables
+  if(is.null(Experiments))
+    x_label <- rownames(CV.X[[1]])
+  else
+    x_label <- Experiments
+  cols <- c("blue", "darkgreen", "purple", "orange","black","yellow","pink")
+  max.lab <- max(nchar(x_label))
+  xlab.line <- max.lab * 0.06 + 4
+  par(mar = c(8, 4, 4, 2))
+  
   for (numcv in 1:numberCanVar) {
     # plot latent variable
-    x.cv <- CV.X[, numcv]
-    x.cv.length <- as.numeric(sqrt(t(x.cv) %*% x.cv))
-    x.cv <- x.cv / x.cv.length
-    
-    y.cv <- CV.Y[, numcv]
-    y.cv.length <- as.numeric(sqrt(t(y.cv) %*% y.cv))
-    y.cv <- y.cv / y.cv.length
+    x.cv <- lapply(CV.X, function(y) {
+      y <- y[, numcv]
+      y.length <- as.numeric(sqrt(t(y) %*% y))
+      y <- y / y.length
+      y })
     
     z.cv <- CV.Z[, numcv]
     z.cv.length <- as.numeric(sqrt(t(z.cv) %*% z.cv))
@@ -36,21 +44,21 @@ plotCCA <- function(CCA3, X, Y, filename=NULL, legend) {
     if (cor(z.cv, x.cv) < 0)
       z.cv <- -z.cv
     
-    maxy <- max(abs(c(x.cv, y.cv, z.cv)))
-    miny <- min(abs(c(x.cv, y.cv, z.cv)))
+    maxy <- max(abs(c(unlist(x.cv), z.cv)))
+    miny <- min(abs(c(unlist(x.cv), z.cv)))
     
     maxyy <- ceiling(maxy / 10 ^ (floor(log(maxy, 10)))) * (10 ^ floor(log(maxy, 10)))
-    if (min(c(x.cv, y.cv, z.cv)) > 0)
+    if (min(c(unlist(x.cv), z.cv)) > 0)
       minyy <- 0
     else
       minyy <- -maxyy
     
     pvx <- c()
-    for (i in 1:dim(CV.X)[1])
+    for (i in 1:dim(CV.X[[1]])[1])
       pvx <- c(pvx, i - 1, i)
     pvy <- c()
-    for (i in 1:dim(CV.X)[1])
-      pvy <- c(pvy, x.cv[i], x.cv[i])
+    for (i in 1:dim(CV.X[[1]])[1])
+      pvy <- c(pvy, x.cv[[1]][i], x.cv[[1]][i])
     
     if (!is.null(filename)) {
       pdf(paste(filename, "_CV_", numcv, ".pdf", sep = ""))
@@ -62,28 +70,39 @@ plotCCA <- function(CCA3, X, Y, filename=NULL, legend) {
          main = paste(numcv, ". canonical variable", sep = ""),
          type = "l",
          col = "green",
-         xlab = "Experiments",
+         xlab = "",
          ylab = "Normalized Intensity",
          axes = F,
          frame.plot = T)
     
-    pvy <- c()
-    for (i in 1:dim(CV.X)[1])
-      pvy <- c(pvy, y.cv[i], y.cv[i])
+    axis(1,
+         at = pvx[seq(1, length(pvx), by = 2)] + 0.4,
+         labels = x_label,
+         las = 2,
+         cex.axis = 0.5)
+    mtext("Experiments",side=1, line = xlab.line)
     
-    lines(pvx + 0.5, pvy, col = "blue")
-    if (length(z.cv) > 0) {
-      pvy <- c()
-      for (i in 1:dim(CV.X)[1])
-        pvy <- c(pvy, z.cv[i], z.cv[i])
-      lines(pvx + 0.6, pvy, col = "red")
+    for(k in 2:length(x.cv)) {
+      
+      pvy <- rep(x.cv[[k]], each = 2)
+      
+      lines(pvx + 0.3 + 0.1*k,
+            pvy,
+            col = cols[k-1])
     }
+    
+    if (length(z.cv) > 0) {
+      pvy <- rep(z.cv, each = 2)
+      lines(pvx + 0.4 + 0.1*length(x.cv), pvy, col = "red")
+    }
+    
     
     axis(2, at = (c(0:6) * (maxyy - minyy)) / 5 + minyy)
     legend("topright" ,
            legend,
-           cex = 0.8,
-           col = c("green", "blue", "red"),
+           cex = 0.5,
+           y.intersep = 0.7,
+           col = c("green", cols[1:length(x.cv)-1], "red"),
            pch = rep(1, 3),
            lty = 1:2)
 
@@ -95,18 +114,22 @@ plotCCA <- function(CCA3, X, Y, filename=NULL, legend) {
     ######################################################
     #plot top features
     
-    Sxj <- sort(abs(CCA3$cc3.weight.x[, numcv]), decreasing = T) # decreasing by weight vectors
-    Syj <- sort(abs(CCA3$cc3.weight.y[, numcv]), decreasing = T)
+    Sxj <- lapply(CCA3$cc3.weight.x,function(x) sort(abs(x[, numcv]), decreasing = T)) # decreasing by weight vectors
     
-    plot2 <- names(Syj)[1:2]
-    plot1 <- names(Sxj)[1:2]
+    plot1 <- lapply(Sxj, function(x) names(x)[1:2])
+    dims <- sapply(plot1, function(x) length(x))
     
-    Data1 <- t(X)
-    Data2 <- t(Y)
-    D3 <- as.matrix(Data1[rownames(Data1) %in% plot1, ])
-    D3 <- rbind(D3, as.matrix(Data2[rownames(Data2) %in% plot2, ]))
-    plot1 <- rownames(D3)[1:length(plot1)]
-    plot2 <- rownames(D3)[(length(plot1) + 1):(length(plot2) + length(plot1))]
+    Data1 <- lapply(X, function(x) t(x))
+    D3_list <- lapply(seq_along(Data1), function(i)
+      as.matrix(Data1[[i]][rownames(Data1[[i]]) %in% plot1[[i]], ]))
+    D3 <- do.call(rbind, D3_list)
+    
+    starts <- c(1, cumsum(dims)[-length(dims)] + 1)
+    ends <- cumsum(dims)
+    
+    for(k in seq_along(dims)) {
+      plot1[[k]] <- rownames(D3)[starts[k]:ends[k]]
+    }
     
     maxy <- max(D3)
     miny <- abs(min(0, min(D3)))
@@ -116,16 +139,12 @@ plotCCA <- function(CCA3, X, Y, filename=NULL, legend) {
     if (is.nan(minyy))
       minyy <- 0
     
-    colors1 <- rainbow(length(plot1), start = 0.4, end = 0.65)
-    colors2 <- rainbow(length(plot2), start = 0, end = 0.15)
+    colors1 <- rainbow(length(unlist(plot1)), start = 0, end = 0.65)
     
-    pvy <- c()
-    for (i in 1:dim(D3)[2])
-      pvy <- c(pvy, D3[1, ][i], D3[1, ][i])
-    pvx <- c()
-    for (i in 1:dim(D3)[2])
-      pvx <- c(pvx, i - 1, i)
-
+    pvy <- rep(D3[1, ], each = 2)
+    pvx <- rep(seq_len(ncol(D3)), each = 2)
+    pvx[seq(1, length(pvx), by = 2)] <- pvx[seq(1, length(pvx), by = 2)] - 1
+    
     if (!is.null(filename)) {
       pdf(paste(filename, "_Top_", numcv, ".pdf", sep = ""))
     }
@@ -133,35 +152,36 @@ plotCCA <- function(CCA3, X, Y, filename=NULL, legend) {
     plot(pvx + 0.3,
          pvy,
          ylim = c(minyy, maxyy),
-         xlab = "Experiments",
+         xaxt = "n",
+         xlab = "",
          ylab = "Intensity",
          col = colors1[1],
          axes = F,
          type = "l",
          frame.plot = T)
-    
+    axis(
+      side = 1,
+      at = pvx[seq(1, length(pvx), by = 2)] + 0.3,
+      labels = x_label,
+      las = 2,
+      cex.axis = 0.5      
+    )
+    mtext("Experiments",side=1, line = xlab.line)
     axis(2, at = (c(0:6) * (maxyy - minyy)) / 5 + minyy)
-    if (length(plot1) > 1) {
-      for (j in 2:length(plot1)) {
-        pvy <- c()
-        for (i in 1:dim(D3)[2])
-          pvy <- c(pvy, D3[j, ][i], D3[j, ][i])
+    
+    if (length(unlist(plot1)) > 1) {
+      for (j in 2:length(unlist(plot1))) {
+        pvy <- rep(D3[j, ], each = 2)
         lines(pvx + 0.3, pvy, col = colors1[j], type = "l")
       }
     }
-    if (length(plot2) > 1) {
-      for (j in 1:length(plot2)) {
-        pvy <- c()
-        for (i in 1:dim(D3)[2])
-          pvy <- c(pvy, D3[j + length(plot1), ][i], D3[j + length(plot1), ][i])
-        lines(pvx + 0.3, pvy, col = colors2[j], type = "l")
-      }
-    }
+    
     legend("topright" ,
            rownames(D3),
-           cex = 0.8,
-           col = c(colors1[1:length(plot1)], colors2[1:length(plot2)]),
-           pch = rep(1, length(c(plot1, plot2))),
+           cex = 0.5,
+           y.intersp = 0.7,
+           col = colors1,
+           pch = rep(1, length(unlist(plot1))),
            lty = 1:2)
     
     if (!is.null(filename)) {

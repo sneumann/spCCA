@@ -41,79 +41,51 @@
 #'
 #' @examples
 #' TRUE
-getCCA3 <- function(X, Y, Z,
-                    end = c(0.3, 0.5, 3),
-                    step = c(0.01, 0.01, 0.2),
+getCCA3 <- function(X, Z,
+                    end, # c(0.3, 0.5, 3),
+                    step, # c(0.01, 0.01, 0.2),
                     numCV = 10,
                     n.r = 10,
                     max.counter.test = 10) {
-  if (dim(X)[1] != dim(Y)[1] || dim(Y)[1] != dim(Z)[1])
-    stop("X,Y,Z data matrices have different sample sizes: ", 
-         dim(X)[1], " ", dim(Y)[1], " ", dim(Z)[1])
+  if (length(end) != length(X)+1 || length(step) != length(X)+1)
+    stop('Length of end or stepsize does not match the total number of datasets')
   
-  cc3.weight.x <- matrix(ncol = 0, nrow = dim(X)[2])
-  cc3.weight.y <- matrix(ncol = 0, nrow = dim(Y)[2])
+  Total_data <- c(X,list(Z))
+  if (length(unique(sapply(Total_data,nrow)))!=1)
+    stop('Data Matrices have different sample sizes: ',sapply(Total_data,nrow))
+  n_sets <- length(X)
+  
+  cc3.weight <- vector("list", n_sets)
+  cc3.CV <- vector("list", n_sets)
+  
+  for (i in seq_len(n_sets)) { 
+    cc3.weight[[i]] <- matrix(ncol = 0, nrow = ncol(X[[i]]))
+    rownames(cc3.weight[[i]]) <- colnames(X[[i]])
+    
+    cc3.CV[[i]] <- matrix(ncol = 0, nrow = nrow(X[[i]]))
+    rownames(cc3.CV[[i]]) <- rownames(X[[i]])
+  }
+  
   cc3.weight.z <- matrix(ncol = 0, nrow = dim(Z)[2])
-  cc3.CV.x <- matrix(ncol = 0, nrow = dim(X)[1])
-  cc3.CV.y <- matrix(ncol = 0, nrow = dim(X)[1])
-  cc3.CV.z <- matrix(ncol = 0, nrow = dim(X)[1])
-  
-  rownames(cc3.weight.x) <- colnames(X)
-  rownames(cc3.weight.y) <- colnames(Y)
+  cc3.CV.z <- matrix(ncol = 0, nrow = dim(Z)[1])
   rownames(cc3.weight.z) <- colnames(Z)
-  rownames(cc3.CV.x) <- rownames(X)
-  rownames(cc3.CV.y) <- rownames(X)
-  rownames(cc3.CV.z) <- rownames(X)
+  rownames(cc3.CV.z) <- rownames(Z)
   
-  all.lambdas <- matrix(ncol = 0, nrow = 3)
+  all.lambdas <- matrix(ncol = 0, nrow = length(Total_data))
   all.corr <- c()
   
-  Z <- apply(Z, 2, function(y) {
-    if (var(y) == 0)
+  Z_std <- apply(Z, 2, function(y) {
+    if (sd(y) == 0)
       y - mean(y)
     else
-      (y - mean(y)) / var(y)
+      (y - mean(y)) / sd(y)
   })
   
-  dims <- c(dim(X)[2], dim(Y)[2], dim(Z)[2])
-  
-  # determine pseudo matrix once - Z does not change
-  if (abs(det(var(Z))) > 10 ^ -20) {
-    # if var(Z) is invertible
-    #Zp <- solve(var(Z)) %*% t(Z)
-    Zp <- ginv(var(Z)) %*% t(Z)
-    
-    } else{
-    Zp <- (diag(1 / sqrt(diag(var(Z))))) %*% t(Z) # otherwise: regularize
-  }
+  dims <- sapply(Total_data, ncol)
   
   canVar = 1
   while (canVar <= numCV) {
-    # calculate the canonical variables
-    # normalize data matrices
-    X <- apply(X, 2, function(y) {
-      if (var(y) == 0)
-        y - mean(y)
-      else
-        (y - mean(y)) / var(y)})
-    
-    Y <- apply(Y, 2, function(y) {
-      if (var(y) == 0)
-        y - mean(y)
-      else
-        (y - mean(y)) / var(y)})
-    
-    # determine Pseudomatrices for every canonical correlation step, 
-    # including ridge regression
-    Xp <- (diag(1 / sqrt(diag(var(X))))) %*% t(X) # strong regularization
-    Yp <- (diag(1 / sqrt(diag(var(Y))))) %*% t(Y)
-    
-    # Pseudomatrices * ...
-    XpZ <- Xp %*% Z
-    YpZ <- Yp %*% Z
-    ZpX <- Zp %*% X
-    ZpY <- Zp %*% Y
-    
+   
     # get best combination of sparsity parameters
     results <- get.best.lambdas(X, Y, Z,
       end = end,
@@ -125,41 +97,61 @@ getCCA3 <- function(X, Y, Z,
       break
     }
     lambdas <- c(results$best.lambda.x,
-                 results$best.lambda.y,
                  results$best.lambda.z)
     corr.scca <- results$corr
     
-    xj <- results$bestVector[1:dims[1]]
-    yj <- results$bestVector[(dims[1] + 1):(dims[1] + dims[2])]
-    zj <- results$bestVector[(dims[1] + dims[2] + 1):(dims[1] + dims[2] + dims[3])]
+    # split vectors
+    split_idx <- rep(seq_along(dims), dims)
+    vectors <- split(results$bestVector, split_idx)
+    
+    zj <- vectors[[length(vectors)]]
+    
+    xj_list <- vectors[-length(vectors)]
+    
+    # standardize X before deflation
+    standardize_X <- function(M){
+      mu <- colMeans(M)
+      sdv <- apply(M, 2, sd)
+      sdv[sdv == 0] <- 1
+      
+      M_scaled <- sweep(sweep(M, 2, mu, "-"), 2, sdv, "/")
+      M_scaled
+    }
+    for (i in seq_along(X)){
+      X[[i]] <- standardize_X(X[[i]])
+    }
     
     # update data matrices by removing the latent variable - only for X and Y
-    zi <- Z %*% zj
-    xi <- X %*% xj
-    reg <- apply(X, 2, function(x) {lm(x ~ xi)} )
-    X <- sapply(reg, function(x) {x[[2]]} )
+    zi <- Z_std %*% zj
+    xi_list <- lapply(seq_along(X), function(i) {
+      X[[i]] %*% xj_list[[i]]
+    })
     
-    yi <- Y %*% yj
-    reg <- apply(Y, 2, function(x) {lm(x ~ yi)} )
-    Y <- sapply(reg, function(x) {x[[2]]} )
+    # deflation
+    for(i in seq_along(X)) {
+      
+      xi <- xi_list[[i]]
+      Xi <- X[[i]]
+      
+      reg <- apply(Xi, 2, function(x) {lm(x ~ xi)} )
+      X[[i]] <- sapply(reg, function(x) {x[[2]]} )   
+    }
     
     all.lambdas <- cbind(all.lambdas, lambdas)
     all.corr <- c(all.corr, corr.scca)
-    cc3.weight.x <- cbind(cc3.weight.x, xj)
-    cc3.weight.y <- cbind(cc3.weight.y, yj)
+    for (i in seq_len(n_sets)){
+      cc3.weight[[i]] <- cbind(cc3.weight[[i]], xj_list[[i]])
+      cc3.CV[[i]] <- cbind(cc3.CV[[i]],xi_list[[i]])
+    }
     cc3.weight.z <- cbind(cc3.weight.z, zj)
-    cc3.CV.x <- cbind(cc3.CV.x, xi)
-    cc3.CV.y <- cbind(cc3.CV.y, yi)
     cc3.CV.z <- cbind(cc3.CV.z, zi)
     
     canVar <- canVar + 1
   } # while canVar
   
-  return(list(cc3.weight.x = cc3.weight.x,
-              cc3.weight.y = cc3.weight.y,
+  return(list(cc3.weight.x = cc3.weight,
               cc3.weight.z = cc3.weight.z,
-              cc3.CV.x = cc3.CV.x,
-              cc3.CV.y = cc3.CV.y,
+              cc3.CV.x = cc3.CV,
               cc3.CV.z = cc3.CV.z,
               corr = all.corr,
               lambda = all.lambdas,
