@@ -27,4 +27,4 @@ Collate: getCCA3.R
      spCCA-package.R
      spCCA_functions.R
 VignetteBuilder: knitr 
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.3
