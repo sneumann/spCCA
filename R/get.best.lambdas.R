@@ -196,11 +196,9 @@ get.best.lambdas <- function(X, Z,
                 
                 for (counter.test in 1:max.counter.test) {
                   uv <- scca.function3Z(XpZ=xpz.predict.list[[i.r]],
-                                        YpZ=ypz.predict.list[[i.r]],
                                         ZpX=zpx.predict.list[[i.r]],
-                                        ZpY=zpy.predict.list[[i.r]],
                                         dims=dims,
-                                        lambda.x=lambda.x, lambda.y=lambda.y, lambda.z=lambda.z,
+                                        lambda.x=lambda.x, lambda.z=lambda.z,
                                         max.iter=maxIteration,
                                         shift=2) # z.initial=bestComb[[4]])
                   

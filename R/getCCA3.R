@@ -87,7 +87,7 @@ getCCA3 <- function(X, Z,
   while (canVar <= numCV) {
    
     # get best combination of sparsity parameters
-    results <- get.best.lambdas(X, Y, Z,
+    results <- get.best.lambdas(X, Z,
       end = end,
       n.r = n.r,
       step = step,
