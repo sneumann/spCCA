@@ -5,6 +5,7 @@ Version: 0.1.6
 Date: 2024-12-25
 Imports:
     MASS,
+    parallel,
     doParallel,
     foreach,
     doRNG

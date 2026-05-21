@@ -31,7 +31,8 @@
 #' @importFrom stats var cor medien runif lm
 #' @importFrom graphics axis lines
 #' @importFrom grDevices dev.off pdf rainbow 
-#' @importFrom doParallel makeCluster registerDoParallel
+#' @importFrom parallel makeCluster detectCores stopCluster
+#' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach %dopar%
 #' @importFrom doRNG %dorng%
 #' 
