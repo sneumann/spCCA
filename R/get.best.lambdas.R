@@ -203,7 +203,7 @@ get.best.lambdas <- function(X, Z,
                                         max.iter=maxIteration,
                                         shift=2) # z.initial=bestComb[[4]])
                   
-                  if (uv$null || uv$i == maxIteration)
+                  if (uv$null || uv$n== maxIteration)
                     next
                   # lambda too big for prediction data set
                   if (is.na(best.corr.train))
