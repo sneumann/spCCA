@@ -196,8 +196,8 @@ get.best.lambdas <- function(X, Z,
                 tol <- 1e-4
                 
                 for (counter.test in 1:max.counter.test) {
-                  uv <- scca.function3Z(XpZ=xpz.predict.list[[i.r]],
-                                        ZpX=zpx.predict.list[[i.r]],
+                  uv <- scca.function3Z(XpZ=XpZ.train.list[[i.r]],
+                                        ZpX=ZpX.train.list[[i.r]],
                                         dims=dims,
                                         lambda.x=lambda.x, lambda.z=lambda.z,
                                         max.iter=maxIteration,
