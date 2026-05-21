@@ -31,9 +31,9 @@
 #' @importFrom stats var cor medien runif lm
 #' @importFrom graphics axis lines
 #' @importFrom grDevices dev.off pdf rainbow 
-#' @import doParallel
-#' @import foreach
-#' @import doRNG
+#' @importFrom doParallel makeCluster registerDoParallel
+#' @importFrom foreach foreach %dopar%
+#' @importFrom doRNG %dorng%
 #' 
 #' @author Andrea Thum, Elena Parkhomenko
 #' @examples
