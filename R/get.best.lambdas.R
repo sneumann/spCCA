@@ -119,9 +119,29 @@ get.best.lambdas <- function(X, Z,
       X.train[[i]] <- tmp$X
       X.test[[i]]  <- standardize_test(X.test[[i]], tmp$mu, tmp$sd)
     }
+    
+    # design matrix Z might be full rank or singular. If columns are full rank, we use Moore-Penrose pseudoinverse. If not, we reduce it to diagonal approximation or standardized transpose
+    Zp.std <- apply(Z.train, 2, function(y) {
+      if (var(y) == 0)
+        y - mean(y)
+      else
+        (y - mean(y)) / var(y)
+    })
+    
+    # determine pseudo matrix once - Z does not change
+    if (abs(det(var(Zp.std))) > 10 ^ -20) {
+      # if var(Z) is invertible
+      #Zp <- solve(var(Z)) %*% t(Z)
+      Zp.train <- ginv(var(Zp.std)) %*% t(Zp.std) # cov(Z) proportional to Z.T *Z
+      
+    } else{
+      Zp.train <- (diag(1 / sqrt(diag(var(Zp.std))))) %*% t(Zp.std) # otherwise: regularize
+    }
+    
+    # standardizing Z-train now
     tmp <- standardize_train(Z.train)
     Z.train <- tmp$X
-    Z.test <- standardize_test(Z.test, tmp$mu, tmp$sd)
+    Z.test  <- standardize_test(Z.test, tmp$mu, tmp$sd)
     
     # Pseudoinverse
     Xp.train <- lapply(X.train, t)
