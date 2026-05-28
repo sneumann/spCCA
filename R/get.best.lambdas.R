@@ -28,20 +28,19 @@
 #        bestVector: all three eigenvectors for x, y, z with best correlation concatenated
 #' 
 #' @export
-#' @importFrom stats var cor medien runif lm
+#' @importFrom stats var cor median runif lm
 #' @importFrom graphics axis lines
 #' @importFrom grDevices dev.off pdf rainbow 
 #' @importFrom parallel makeCluster detectCores stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach %dopar%
-#' @importFrom doRNG %dorng%
+#' @importFrom doRNG %dorng% registerDoRNG
 #' 
 #' @author Andrea Thum, Elena Parkhomenko
 #' @examples
 #' TRUE
 get.best.lambdas <- function(X, Z,
-                             start = c(0, 0, 0), # for minimum 3 datasets
-                             end = c(0.2, 0.2, 2),
+                             end = c(0.2, 0.2, 2), # for minimum 3 datasets
                              step = c(0.02, 0.02, 0.2),
                              n.r = 10,
                              max.counter.test = 10)
@@ -51,11 +50,11 @@ get.best.lambdas <- function(X, Z,
   lambda.x.seq <- vector("list",n_sets)
   n.lambdas.x <- vector("list",n_sets)
   for (i in 1:n_sets) {
-    lambda.x.seq[[i]] <- seq(start[i], end[i], by = step[i])
+    lambda.x.seq[[i]] <- seq(0, end[i], by = step[i])
     n.lambdas.x[[i]] <- length(lambda.x.seq[[i]])
   }
   
-  lambda.z.seq <- seq(start[n_sets+1], end[n_sets+1], by = step[n_sets+1])
+  lambda.z.seq <- seq(0, end[n_sets+1], by = step[n_sets+1])
   n.lambdas.z <-  length(lambda.z.seq)
   
   lambda_list <- c(lambda.x.seq, list(lambda.z.seq))
@@ -174,12 +173,19 @@ get.best.lambdas <- function(X, Z,
   # now cross-validate: parallel processing
   cl <- makeCluster(detectCores()-3)
   registerDoParallel(cl)
+  parallel::clusterEvalQ(cl, {
+    options(error = function() {
+      traceback(2)
+      stop("Worker error")
+    })
+  })
+  registerDoRNG(3)
   
   results <- foreach(j = 1:nrow(lambda.grid),
                      .combine = 'c',
                      .export = "scca.function3Z",
-                     .packages = c("MASS"), .options.RNG = 123) %dopar% {
-                       
+                     .packages = c("MASS")) %dopar% {
+
                lambda.x <- as.numeric(lambda.grid[j, 1:n_sets]) 
                lambda.z <- as.numeric(lambda.grid[j, n_sets+1])
                all.Patterns <- list()
@@ -267,6 +273,7 @@ get.best.lambdas <- function(X, Z,
               # cluster xyz.vectors
               if (length(all.Patterns) == 0) {
                 test.corr <- NA
+                canVarVector <- NA
               } else {
                 ResamplingCorr <- unlist(lapply(all.Patterns, 
                                                 function(item) {item[[1]]} ))
@@ -296,10 +303,9 @@ get.best.lambdas <- function(X, Z,
               ))
               
   } # foreach end
-  stopCluster(cl)
+  on.exit(stopCluster(cl))
   test.corr.scca <- sapply(results, `[[`, "test.corr")
   max.corr <- max(test.corr.scca, na.rm = TRUE)
-  print(max.corr)
   if (max.corr == 0)
     return(NULL) # no correlations found
   
