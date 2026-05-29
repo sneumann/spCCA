@@ -133,14 +133,22 @@ test_that("results are stable under scaling of X list", {
   end <- c(0.3, 0.3, 3)
   step <- c(0.1, 0.1, 0.5)
   
+  set.seed(1)
   res1 <- getCCA3(X, Z, end, step, numCV = 4)
   
   X_scaled <- lapply(X, function(x) x * 10)
-  
+  set.seed(1)
   res2 <- getCCA3(X_scaled, Z, end, step, numCV = 4)
+  
+  X_scaled2 <- lapply(X, function(x) x * 2)
+  set.seed(1)
+  res3 <- getCCA3(X_scaled2, Z, end, step, numCV = 4)
 
   expect_true(
-    abs(res1$corr[1] - res2$corr[1]) < 0.05
+    all.equal(res1, res2, tolerance = 1e-7)
+  )
+  expect_true(
+    all.equal(res1, res3, tolerance = 1e-7)
   )
 })
 
