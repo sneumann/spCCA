@@ -40,34 +40,20 @@
 #' @examples
 #' TRUE
 get.best.lambdas <- function(X, Z,
-                             end = c(0.2, 0.2, 2), # for minimum 3 datasets
-                             step = c(0.02, 0.02, 0.2),
+                             lambda.grid,
                              n.r = 10,
                              max.counter.test = 10)
 {
-  n_sets <- length(X)
+  n.sets <- length(X)
   
-  lambda.x.seq <- vector("list",n_sets)
-  n.lambdas.x <- vector("list",n_sets)
-  for (i in 1:n_sets) {
-    lambda.x.seq[[i]] <- seq(0, end[i], by = step[i])
-    n.lambdas.x[[i]] <- length(lambda.x.seq[[i]])
-  }
-  
-  lambda.z.seq <- seq(0, end[n_sets+1], by = step[n_sets+1])
-  n.lambdas.z <-  length(lambda.z.seq)
-  
-  lambda_list <- c(lambda.x.seq, list(lambda.z.seq))
-  
-  dims_X <- sapply(X, ncol)
-  dims <- c(dims_X, ncol(Z))
+  dims.X <- sapply(X, ncol)
+  dims <- c(dims.X, ncol(Z))
   
   n.sample <- nrow(X[[1]])
   n.r.sample <- max(trunc(n.sample / 8), 3)#at least 1/8 of the features - otherwise problems with Z may occur in testing sample
   whole.sample <- seq(1, n.sample)
   
   maxIteration <- 100
-  lambda.grid <- expand.grid(lambda_list)
   test.corr <- 0
 
   # while-loop here, because test data sets can lead to 0-variation in special cases
@@ -93,31 +79,30 @@ get.best.lambdas <- function(X, Z,
     Z.test  <- Z[testing.sample, , drop = FALSE]
     
     
-    
     if (max(abs(var(Z.test))) == 0)
       next # only zeros, try again
     
     # Standardize data: replaced var with sd. Also, independent standardization of test 
     # might lead to data leakage, hence we use mu and sdv of train set
     
-    standardize_train <- function(M) {
+    standardize.train <- function(M) {
       mu <- colMeans(M)
       sdv <- apply(M, 2, sd)
       sdv[sdv == 0] <- 1
       
-      M_scaled <- sweep(sweep(M, 2, mu, "-"), 2, sdv, "/")
-      list(X = M_scaled, mu = mu, sd = sdv)
+      M.scaled <- sweep(sweep(M, 2, mu, "-"), 2, sdv, "/")
+      list(X = M.scaled, mu = mu, sd = sdv)
     }
     
-    standardize_test <- function(M, mu, sdv) {
+    standardize.test <- function(M, mu, sdv) {
       sweep(sweep(M, 2, mu, "-"), 2, sdv, "/")
     }
     
     
     for (i in seq_along(X.train)) {
-      tmp <- standardize_train(X.train[[i]])
+      tmp <- standardize.train(X.train[[i]])
       X.train[[i]] <- tmp$X
-      X.test[[i]]  <- standardize_test(X.test[[i]], tmp$mu, tmp$sd)
+      X.test[[i]]  <- standardize.test(X.test[[i]], tmp$mu, tmp$sd)
     }
     
     # design matrix Z might be full rank or singular. If columns are full rank, we use Moore-Penrose pseudoinverse. If not, we reduce it to diagonal approximation or standardized transpose
@@ -139,9 +124,9 @@ get.best.lambdas <- function(X, Z,
     }
     
     # standardizing Z-train now
-    tmp <- standardize_train(Z.train)
+    tmp <- standardize.train(Z.train)
     Z.train <- tmp$X
-    Z.test  <- standardize_test(Z.test, tmp$mu, tmp$sd)
+    Z.test  <- standardize.test(Z.test, tmp$mu, tmp$sd)
     
     # Pseudoinverse
     Xp.train <- lapply(X.train, t)
@@ -186,8 +171,8 @@ get.best.lambdas <- function(X, Z,
                      .export = "scca.function3Z",
                      .packages = c("MASS")) %dopar% {
 
-               lambda.x <- as.numeric(lambda.grid[j, 1:n_sets]) 
-               lambda.z <- as.numeric(lambda.grid[j, n_sets+1])
+               lambda.x <- as.numeric(lambda.grid[j, 1:n.sets]) 
+               lambda.z <- as.numeric(lambda.grid[j, n.sets+1])
                all.Patterns <- list()
                test.corr <- 0 
                valid.count <- 0
@@ -312,8 +297,8 @@ get.best.lambdas <- function(X, Z,
   i.lambda <- which.max(test.corr.scca)
   
   best.lambda <- results[[i.lambda]][[1]]
-  lambda.x = best.lambda[1:n_sets]
-  lambda.z = best.lambda[n_sets+1]
+  lambda.x = best.lambda[1:n.sets]
+  lambda.z = best.lambda[n.sets+1]
   bestVector <- results[[i.lambda]][[3]]
   
   return(list(best.lambda.x = lambda.x,

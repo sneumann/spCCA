@@ -46,19 +46,51 @@ getCCA3 <- function(X, Z,
                     step, # c(0.01, 0.01, 0.2),
                     numCV = 10,
                     n.r = 10,
-                    max.counter.test = 10) {
+                    max.counter.test = 10,
+                    grid.search = 'exhaustive',
+                    n.comb = 5000) {
   if (length(end) != length(X)+1 || length(step) != length(X)+1)
     stop('Length of end or stepsize does not match the total number of datasets')
   
-  Total_data <- c(X,list(Z))
-  if (length(unique(sapply(Total_data,nrow)))!=1)
-    stop('Data Matrices have different sample sizes: ',sapply(Total_data,nrow))
-  n_sets <- length(X)
+  n.values <- mapply(function(e, s) {
+    
+    floor(e / s) + 1
+    
+  }, end, step)
+  total.combinations <- prod(n.values)
   
-  cc3.weight <- vector("list", n_sets)
-  cc3.CV <- vector("list", n_sets)
+  if (total.combinations > 10000 && grid.search == "exhaustive")
+    message("\033[1;31m Total lambda combinations = ", total.combinations,
+    ". The current lambda grid is very large and may take a long time to evaluate. ",
+    "For faster execution, consider stopping the run and using random search (default n.comb = 5000) or adjusting end - step values.\033[0m")
   
-  for (i in seq_len(n_sets)) { 
+  n.sets <- length(X)
+  lambda.x.seq <- vector("list",n.sets)
+  for (i in 1:n.sets) {
+    lambda.x.seq[[i]] <- seq(0, end[i], by = step[i])
+  }
+  lambda.z.seq <- seq(0, end[n.sets+1], by = step[n.sets+1])
+  lambda.list <- c(lambda.x.seq, list(lambda.z.seq))
+  lambda.grid.full <- expand.grid(lambda.list)
+  
+  if (grid.search == "exhaustive")
+    lambda.grid <- lambda.grid.full
+  else if (grid.search == "random")
+    lambda.grid <- lambda.grid.full[
+      sample(nrow(lambda.grid.full), n.comb),
+    ]
+  else
+    stop("Argument 'grid.search' must be either 'exhaustive' or 'random'.")
+  
+  Total.data <- c(X,list(Z))
+  
+  if (length(unique(sapply(Total.data,nrow)))!=1)
+    stop('Data Matrices have different sample sizes: ',sapply(Total.data,nrow))
+
+  cc3.weight <- vector("list", n.sets)
+  cc3.CV <- vector("list", n.sets)
+  
+  for (i in seq_len(n.sets)) { 
     cc3.weight[[i]] <- matrix(ncol = 0, nrow = ncol(X[[i]]))
     rownames(cc3.weight[[i]]) <- colnames(X[[i]])
     
@@ -71,26 +103,25 @@ getCCA3 <- function(X, Z,
   rownames(cc3.weight.z) <- colnames(Z)
   rownames(cc3.CV.z) <- rownames(Z)
   
-  all.lambdas <- matrix(ncol = 0, nrow = length(Total_data))
+  all.lambdas <- matrix(ncol = 0, nrow = length(Total.data))
   all.corr <- c()
   
-  Z_std <- apply(Z, 2, function(y) {
+  Z.std <- apply(Z, 2, function(y) {
     if (sd(y) == 0)
       y - mean(y)
     else
       (y - mean(y)) / sd(y)
   })
   
-  dims <- sapply(Total_data, ncol)
+  dims <- sapply(Total.data, ncol)
   
   canVar = 1
   while (canVar <= numCV) {
    
     # get best combination of sparsity parameters
     results <- get.best.lambdas(X, Z,
-      end = end,
+      lambda.grid = lambda.grid,
       n.r = n.r,
-      step = step,
       max.counter.test = max.counter.test) 
     
     if (is.null(results)) {
@@ -101,36 +132,36 @@ getCCA3 <- function(X, Z,
     corr.scca <- results$corr
     
     # split vectors
-    split_idx <- rep(seq_along(dims), dims)
-    vectors <- split(results$bestVector, split_idx)
+    split.idx <- rep(seq_along(dims), dims)
+    vectors <- split(results$bestVector, split.idx)
     
     zj <- vectors[[length(vectors)]]
     
-    xj_list <- vectors[-length(vectors)]
+    xj.list <- vectors[-length(vectors)]
     
     # standardize X before deflation
-    standardize_X <- function(M){
+    standardize.X <- function(M){
       mu <- colMeans(M)
       sdv <- apply(M, 2, sd)
       sdv[sdv == 0] <- 1
       
-      M_scaled <- sweep(sweep(M, 2, mu, "-"), 2, sdv, "/")
-      M_scaled
+      M.scaled <- sweep(sweep(M, 2, mu, "-"), 2, sdv, "/")
+      M.scaled
     }
     for (i in seq_along(X)){
-      X[[i]] <- standardize_X(X[[i]])
+      X[[i]] <- standardize.X(X[[i]])
     }
     
     # update data matrices by removing the latent variable - only for X and Y
-    zi <- Z_std %*% zj
-    xi_list <- lapply(seq_along(X), function(i) {
-      X[[i]] %*% xj_list[[i]]
+    zi <- Z.std %*% zj
+    xi.list <- lapply(seq_along(X), function(i) {
+      X[[i]] %*% xj.list[[i]]
     })
     
     # deflation
     for(i in seq_along(X)) {
       
-      xi <- xi_list[[i]]
+      xi <- xi.list[[i]]
       Xi <- X[[i]]
       
       reg <- apply(Xi, 2, function(x) {lm(x ~ xi)} )
@@ -139,9 +170,9 @@ getCCA3 <- function(X, Z,
     
     all.lambdas <- cbind(all.lambdas, lambdas)
     all.corr <- c(all.corr, corr.scca)
-    for (i in seq_len(n_sets)){
-      cc3.weight[[i]] <- cbind(cc3.weight[[i]], xj_list[[i]])
-      cc3.CV[[i]] <- cbind(cc3.CV[[i]],xi_list[[i]])
+    for (i in seq_len(n.sets)){
+      cc3.weight[[i]] <- cbind(cc3.weight[[i]], xj.list[[i]])
+      cc3.CV[[i]] <- cbind(cc3.CV[[i]],xi.list[[i]])
     }
     cc3.weight.z <- cbind(cc3.weight.z, zj)
     cc3.CV.z <- cbind(cc3.CV.z, zi)
