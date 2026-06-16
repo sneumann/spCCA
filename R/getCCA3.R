@@ -1,4 +1,4 @@
-#' Calculate supervised CCA on three data matrices
+#' Calculate supervised CCA on three or more data matrices
 #'
 #' getCCA3() starts the supervised sparse CCA 
 #' 
@@ -6,9 +6,9 @@
 #' 
 #' 
 #' The getCCA3() function performs sparse 
-#' canonical correlation analysis on three data matrices 
-#' (two biological data sets X,Y, and one design data set Z) with elastic net. 
-#' Data sets X and Y are strongly regularized (ridge regression); Z if neccessary (det(Z)==0).
+#' canonical correlation analysis on three or more data matrices 
+#' (n Biological data sets in X, and one design data set Z) with elastic net. 
+#' Data sets in X are strongly regularized (ridge regression); Z if neccessary (det(Z)==0).
 #' 
 #' The getCCA3 first normalizes the data matrices (column-wise mean centering and unit variance), 
 #' computes canonical variables, 
@@ -18,25 +18,26 @@
 #' correlation coefficients, and optimal sparsity parameters (lambda values) 
 #' for each canonical variable.
 #' 
-#' @param X biological data set with dim(X): n rows, p features
-#' @param Y biological data set with dim(Y): n rows, q features
-#' @param Z design data set with dim(Z): n rows, r features; describes experimental design with binary vectors
-#' @param end,step end and stepsize for lambda.{x,y,z} grid search.
+#' @param X list of biological data sets with dim(X1, X2,..): n rows/samples, p features
+#' @param Z design data set with dim(Z): n rows/samples, r features; describes experimental design with binary vectors
+#' @param end,step end and stepsize for lambda.(x,y,z) grid search.
 #' @param n.r number of resampling runs, 10 is okay
 #' @param max.counter.test number of random start vectors for iteration (inner loop)
 #' @param numCV number of canonical variables which will be calculated
+#' @param grid.search search strategy for lambda: exhaustive considers all possible lambda combinations, random considers sampled set of lambda combinations
+#' @param n.comb number of lambda combinations to be sampled if random grid search is selected
 #'
 #' @return A list with the elements 
-#'   cc3.weights.{xyz}: Matrices with weights of canonical variables for data set X, Y and Z respectively (columnwise)
-#'   cc3.CV.{xyz}: matrices with canonical variables for data set X, Y and Z respectively (columnwise)
-#'   corr: matrix with correlation coefficient for pairwise (X-Y,X-Z,YZ) and correlation of can. variable: sum(corr(X-Z),corr(Y-Z))/2 (columnwise)
-#'         STN: contradictory documentation, corr could be: Vector with absolute correlation coefficients of canonical variables (columnwise): (corr(cv(X),cv(Z))+ corr(cv(Y),cv(Z))/2    
-#'   lambda: best lambda.{xyz} for each data set and for each can. var. (columnwise)
+#'   cc3.weights.(xz): Matrices with weights of canonical variables for data sets X and Z respectively (columnwise)
+#'   cc3.CV.(xz): matrices with canonical variables for data set X and Z respectively (columnwise)
+#'   corr: matrix with correlation coefficient for pairwise (X-Z,Y-Z) and correlation of can. variable: mean(abs(corr(X-Z)),abs(corr(Y-Z))) (columnwise)
+#'   lambda: best lambda.(xyz) for each data set and for each can. var. (columnwise)
 #'   numCV: Number of canonical variables
 #'   
 #' @keywords supervised CCA sparse
-#' @author Andrea Thum
+#' @author Anjana Bhat, Andrea Thum
 #' @importFrom MASS ginv
+#' @importFrom stats sd
 #' @export
 #'
 #' @examples
@@ -59,7 +60,7 @@ getCCA3 <- function(X, Z,
   }, end, step)
   total.combinations <- prod(n.values)
   
-  if (total.combinations > 10000 && grid.search == "exhaustive")
+  if (total.combinations > 20000 && grid.search == "exhaustive")
     message("\033[1;31m Total lambda combinations = ", total.combinations,
     ". The current lambda grid is very large and may take a long time to evaluate. ",
     "For faster execution, consider stopping the run and using random search (default n.comb = 5000) or adjusting end - step values.\033[0m")

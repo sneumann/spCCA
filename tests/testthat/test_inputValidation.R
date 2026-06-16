@@ -6,7 +6,6 @@ test_that("Errors when datasets in X have different row counts", {
     matrix(rnorm(120), 12, 10),
     matrix(rnorm(150), 10, 15)
   )
-  set.seed(123)
   Z <- matrix(sample(c(0, 1), 50, replace = TRUE), ncol = 5)  
   end <- c(0.3, 0.3, 3)
   step <- c(0.01, 0.01, 0.2)
@@ -22,7 +21,6 @@ test_that("Errors when X and Z row counts differ", {
     matrix(rnorm(120), 10, 12),
     matrix(rnorm(150), 10, 15)
   )
-  set.seed(123)
   Z <- matrix(sample(c(0, 1), 10, replace = TRUE), ncol = 5)  
   end <- c(0.3, 0.3, 3)
   step <- c(0.01, 0.01, 0.2)

@@ -17,18 +17,18 @@
 #' for data set with about 1000 features, lambda.end=0.3 should be high enough; 
 #' use higher end values for smaller data sets and lower for bigger data sets.
 #'
-#' @param X,Y,Z three data sets, Z is design data set, (STN: all three ?) already normalized to zero mean and variance 1
-#' @param start,end,step start, end and stepsize for lambda.{x,y,z} grid search.
+#' @param X,Z biological data sets, Z is design data set
+#' @param lambda.grid set of lambda combinations
 #' @param n.r number of resampling steps
 #' @param max.counter.test number of random start vectors for iteration (inner loop)
 #'
 #' @return list with three components:
-#'       best.lambdas: optimal lambdas for the three data sets
+#'       best.lambdas: optimal lambdas for the data sets
 #        corr: best test set correlation for best vector
-#        bestVector: all three eigenvectors for x, y, z with best correlation concatenated
+#        bestVector: all eigenvectors for X and Z with best correlation concatenated
 #' 
 #' @export
-#' @importFrom stats var cor median runif lm
+#' @importFrom stats var cor median runif lm sd
 #' @importFrom graphics axis lines
 #' @importFrom grDevices dev.off pdf rainbow 
 #' @importFrom parallel makeCluster detectCores stopCluster
@@ -36,7 +36,7 @@
 #' @importFrom foreach foreach %dopar%
 #' @importFrom doRNG %dorng% registerDoRNG
 #' 
-#' @author Andrea Thum, Elena Parkhomenko
+#' @author Anjana Bhat, Andrea Thum, Elena Parkhomenko
 #' @examples
 #' TRUE
 get.best.lambdas <- function(X, Z,
@@ -105,8 +105,8 @@ get.best.lambdas <- function(X, Z,
       X.test[[i]]  <- standardize.test(X.test[[i]], tmp$mu, tmp$sd)
     }
     
-    # design matrix Z might be full rank or singular. If columns are full rank, we use Moore-Penrose pseudoinverse. If not, we reduce it to diagonal approximation or standardized transpose
-    Zp.std <- apply(Z.train, 2, function(y) {
+    # design matrix Z might be full rank or singular. If columns are singular, we use Moore-Penrose pseudoinverse. If not, we compute inverse of the matrix
+    Z.std <- apply(Z.train, 2, function(y){
       if (var(y) == 0)
         y - mean(y)
       else
@@ -114,13 +114,12 @@ get.best.lambdas <- function(X, Z,
     })
     
     # determine pseudo matrix once - Z does not change
-    if (abs(det(var(Zp.std))) > 10 ^ -20) {
+    if (abs(det(var(Z.std))) > 10 ^ -20) {
       # if var(Z) is invertible
-      #Zp <- solve(var(Z)) %*% t(Z)
-      Zp.train <- ginv(var(Zp.std)) %*% t(Zp.std) # cov(Z) proportional to Z.T *Z
+      Zp.train <- ginv(var(Z.std)) %*% t(Z.std) # cov(Z) proportional to Z.T *Z
       
     } else{
-      Zp.train <- (diag(1 / sqrt(diag(var(Zp.std))))) %*% t(Zp.std) # otherwise: regularize
+      Zp.train <- (diag(1 / sqrt(diag(var(Z.std))))) %*% t(Z.std) # otherwise: regularize
     }
     
     # standardizing Z-train now
@@ -128,11 +127,8 @@ get.best.lambdas <- function(X, Z,
     Z.train <- tmp$X
     Z.test  <- standardize.test(Z.test, tmp$mu, tmp$sd)
     
-    # Pseudoinverse
+    # Pseudomatrix 
     Xp.train <- lapply(X.train, t)
-    
-    # due to standardization, var(Z) becomes identity matrix
-    Zp.train <- t(Z.train)
     
     XpZ.train <- list()
     ZpX.train <- list()
@@ -156,7 +152,13 @@ get.best.lambdas <- function(X, Z,
   } # while k
   
   # now cross-validate: parallel processing
-  cl <- makeCluster(detectCores()-3)
+  n_cores <- detectCores()
+  workers <- max(2, n_cores-2)
+  # Limit to 2 when CRAN is checking
+  if (identical(tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_", "false")), "true")) {
+    workers <- 2
+  }
+  cl <- makeCluster(workers)
   registerDoParallel(cl)
   parallel::clusterEvalQ(cl, {
     options(error = function() {
@@ -165,6 +167,7 @@ get.best.lambdas <- function(X, Z,
     })
   })
   registerDoRNG(3)
+  
   
   results <- foreach(j = 1:nrow(lambda.grid),
                      .combine = 'c',
@@ -200,7 +203,7 @@ get.best.lambdas <- function(X, Z,
                   if (is.na(best.corr.train))
                     best.corr.train = 0 # converged for first time
                   
-                  xj <- uv$x.new	# sparse singular vector (canonical vector for Y)
+                  xj <- uv$x.new	# sparse singular vector (canonical vector for X)
                   zj <- uv$z.new
                   
                   if (any(mapply(function(x_t, x_j) var(x_t %*% x_j) == 0, X.test.list[[i.r]], xj )) ||
@@ -290,11 +293,11 @@ get.best.lambdas <- function(X, Z,
   } # foreach end
   on.exit(stopCluster(cl))
   test.corr.scca <- sapply(results, `[[`, "test.corr")
-  max.corr <- max(test.corr.scca, na.rm = TRUE)
-  if (max.corr == 0)
+  if(all(is.na(test.corr.scca)))
     return(NULL) # no correlations found
-  
+  max.corr <- max(test.corr.scca, na.rm = TRUE)
   i.lambda <- which.max(test.corr.scca)
+    
   
   best.lambda <- results[[i.lambda]][[1]]
   lambda.x = best.lambda[1:n.sets]

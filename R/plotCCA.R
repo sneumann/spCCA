@@ -4,9 +4,12 @@
 #' 
 #' 
 #' @param CCA3 list with getCCA3() information to plot
-#' @param X,Y original biological data matrices without subtraction of canonical variables, for plots of top features
+#' @param X original biological data matrices without subtraction of canonical variables, for plots of top features
+#' @param Experiments Sample names for X-axis. If NULL, rownames from CCA3 are considered
 #' @param filename If NULL, figures are plotted on screen, otherwise CCA-project name as base output filename (_CV_numcv.pdf and _Top_numcv.pdf will be appended)
-#' @param legend names of data sets X, Y, Z for legend, e.g. c("Genes", "Metabolites","Design Patterns")
+#' @param legend names of data sets X, Z for legend, e.g. c("Genes", "Metabolites","Design")
+#'
+#' @importFrom graphics mtext par
 #'
 #' @return
 #' @export
@@ -41,7 +44,7 @@ plotCCA <- function(CCA3, X, Experiments = NULL, filename=NULL, legend) {
     z.cv.length <- as.numeric(sqrt(t(z.cv) %*% z.cv))
     z.cv <- z.cv / z.cv.length
     
-    if (cor(z.cv, x.cv) < 0)
+    if (cor(z.cv, x.cv[[1]]) < 0)
       z.cv <- -z.cv
     
     maxy <- max(abs(c(unlist(x.cv), z.cv)))
@@ -70,6 +73,7 @@ plotCCA <- function(CCA3, X, Experiments = NULL, filename=NULL, legend) {
          main = paste(numcv, ". canonical variable", sep = ""),
          type = "l",
          col = "green",
+         xaxt ="n",
          xlab = "",
          ylab = "Normalized Intensity",
          axes = F,
@@ -101,7 +105,7 @@ plotCCA <- function(CCA3, X, Experiments = NULL, filename=NULL, legend) {
     legend("topright" ,
            legend,
            cex = 0.5,
-           y.intersep = 0.7,
+           y.intersp = 0.7,
            col = c("green", cols[1:length(x.cv)-1], "red"),
            pch = rep(1, 3),
            lty = 1:2)

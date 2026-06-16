@@ -1,12 +1,18 @@
-CHANGES IN VERSION 0.1.1
+CHANGES IN VERSION 0.1.7
 --------------------------
 
 USER VISIBLE CHANGES
-    o bla
+    o Extended spCCA from supporting 2 biological datasets to a generalized framework supporting n biological datasets (input provided as a list)
 
 NEW FEATURES
-    o blub
+    o Updated data standardization procedure to use standard deviation scaling instead of variance scaling, reducing noise amplification and preventing low-variance feature inflation.
+    o Introduced a flexible lambda search strategy, allowing users to choose between:
+	* Exhaustive grid search
+	* Random search with a user-defined number of sampled lambda combinations
+    o Improved computational performance through:
+	* Enhanced parallelization
+	* Reduced maximum iteration threshold for model convergence
 
 BUG FIXES
-    o foobar
+    o -
 

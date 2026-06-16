@@ -82,26 +82,16 @@ create.Sim.Dataset<-function() {
         Y<-cbind(Y,random)
     }
 
-
-    write.table(X,"simX.txt",sep="\t")
-    write.table(Y,"simY.txt",sep="\t")
-    write.table(Z,"simZ.txt",sep="\t")
+    return(list(X=X, Y=Y, Z=Z))
+    # write.table(X,"simX.txt",sep="\t")
+    # write.table(Y,"simY.txt",sep="\t")
+    # write.table(Z,"simZ.txt",sep="\t")
 }
 
 test.CCA.forSim<-function(){
-    # source("get.best.lambdas.R")
-    # source("getCCA3.R")
-    # source("plotCCA.R")
-    # source("save.CCA.R")
-    # source("scca.function3.R")
-  
-    # library(spCCA)  
+    datasets <- create.Sim.Dataset()
 
-    X2<-read.table("simX.txt",sep="\t")
-    Y2<-read.table("simY.txt",sep="\t")
-    Z2<-read.table("simZ.txt",sep="\t")
-
-    CCA3 <- getCCA3(X=X2, Y=Y2, Z=Z2, numCV=4)
+    CCA3 <- getCCA3(X=list(datasets$X, datasets$Y), Z=datasets$Z, numCV=4)
 
 }
 

@@ -8,6 +8,9 @@
 #' 
 #' @param CCA3 list with getCCA3() information to save
 #' @param filename CCA-project name as base output filename (_numcv.txt be appended)
+#' @param omic.names names of biological datasets (X) to separate selected features list in text file
+#' 
+#'  @importFrom utils tail
 #'
 #' @return
 #' @export
@@ -15,7 +18,7 @@
 #' @author Andrea Thum
 #' @examples
 #' TRUE
-save.CCA <- function(CCA3, filename, omic_names) {
+save.CCA <- function(CCA3, filename, omic.names) {
   for (numcv in c(1:dim(CCA3$cc3.weight.x[[1]])[2])) {
     Sxj <- lapply(CCA3$cc3.weight.x, function(x) sort(abs(x[, numcv]), decreasing = T)) # # decreasing by weight vectors
     oS <- lapply(CCA3$cc3.weight.x, function(x) order(abs(x[, numcv]), decreasing = T))
@@ -44,7 +47,7 @@ save.CCA <- function(CCA3, filename, omic_names) {
           append = F
     )
     for (S in seq_along(Sxj)){
-      out <- paste('### ',omic_names[S],' ###')
+      out <- paste('### ',omic.names[S],' ###')
       write(out, file = fname, append = TRUE)
       for (j in 1:length(Sxj[[S]])) {
         if (Sxj[[S]][j] == 0.0)

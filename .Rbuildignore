@@ -1,4 +1,6 @@
-.*~
-^\.github$
 ^.*\.Rproj$
+^\.github$
+^\.git$
 ^\.Rproj\.user$
+^vignettes/spCCA_cache$
+^vignettes/spCCA_cache/.*$
