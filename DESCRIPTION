@@ -21,11 +21,10 @@ Author@R: c(person("Anjana", "Bhat", role = , email="anjana.bhat@ipb-halle.de"),
             person("Stefan", "Posch", role = "aut", email="posch@informatik.uni-halle.de"))
 Maintainer: Steffen Neumann <sneumann@ipb-halle.de>
 Description: Combines sparse (penalized) CCA for n biological data sets 
-  with a third data set, the experimental design and tries to find correlations 
+  with the experimental design and tries to find correlations 
   between biological data sets and design data set, that are well-explainable.
 License: file LICENSE 
-Collate: globalVariables.R
-     getCCA3.R
+Collate: getCCA3.R
      get.best.lambdas.R
      plotCCA.R
      save.CCA.R

@@ -19,6 +19,8 @@
 #' @examples
 #' TRUE
 save.CCA <- function(CCA3, filename, omic.names) {
+  if(length(omic.names) != length(CCA3$cc3.weight.x))
+    stop("Length of omic.names (",length(omic.names),") does not match length of X datasets (",length(CCA3$cc3.weight.x),")")
   for (numcv in c(1:dim(CCA3$cc3.weight.x[[1]])[2])) {
     Sxj <- lapply(CCA3$cc3.weight.x, function(x) sort(abs(x[, numcv]), decreasing = T)) # # decreasing by weight vectors
     oS <- lapply(CCA3$cc3.weight.x, function(x) order(abs(x[, numcv]), decreasing = T))

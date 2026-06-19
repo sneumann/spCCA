@@ -51,7 +51,7 @@ getCCA3 <- function(X, Z,
                     grid.search = 'exhaustive',
                     n.comb = 5000) {
   if (length(end) != length(X)+1 || length(step) != length(X)+1)
-    stop('Length of end or stepsize does not match the total number of datasets')
+    stop("Length of end (",length(end),") or stepsize (",length(step),") does not match the total number of datasets (",length(X)+1,")")
   
   n.values <- mapply(function(e, s) {
     

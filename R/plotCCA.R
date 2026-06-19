@@ -18,7 +18,7 @@
 #' TRUE
 plotCCA <- function(CCA3, X, Experiments = NULL, filename=NULL, legend) {
   if (length(legend) != length(X)+1)
-    stop("Length of legend must match the total number of datasets")
+    stop("Length of legend (",length(legend),") must match the total number of datasets (",length(X)+1,")")
   CV.X = CCA3$cc3.CV.x
   CV.Z = CCA3$cc3.CV.z
 

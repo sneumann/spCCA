@@ -169,11 +169,12 @@ get.best.lambdas <- function(X, Z,
   registerDoRNG(3)
   
   
-  results <- foreach(j = 1:nrow(lambda.grid),
+  results <- foreach(k = 1:nrow(lambda.grid),
                      .combine = 'c',
                      .export = "scca.function3Z",
                      .packages = c("MASS")) %dopar% {
-
+                       
+               j <- k
                lambda.x <- as.numeric(lambda.grid[j, 1:n.sets]) 
                lambda.z <- as.numeric(lambda.grid[j, n.sets+1])
                all.Patterns <- list()
