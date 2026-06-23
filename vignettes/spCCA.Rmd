@@ -6,6 +6,8 @@ output:
     includes:
       in_header: spcca.bioschemas.html
 author:
+- name: Anjana Bhat
+  email: abhat@ipb-halle.de
 - name: Andrea Thum
   email: andrea.thum@informatik.uni-halle.de
 - name: Steffen Neumann
@@ -26,6 +28,10 @@ vignette: |
 bibliography: lit.bib
 csl: biomed-central.csl
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache = FALSE)
+```
 
 ```{r LibraryPreload, echo=FALSE, results='hide'}
 library(spCCA)
@@ -116,14 +122,15 @@ numCV <- 6 # number of canonical variables to calculate
 end  <- c(1.0,  0.2,  2.0)
 step <- c(0.05, 0.01, 0.1)
 
-CCA3 <- getCCA3(X=X, Y=Y, Z=Z, 
+X <- list(X,Y)
+
+CCA3 <- getCCA3(X=X, Z=Z, 
                 numCV=numCV,
                 end=end, step=step,
                 n.r = 5, ## number of repeats, increase to 10 when parameters are stable
                 max.counter.test = 5 ## number of random start vectors for iteration, increase to 10-20 when parameters are stable
                 )  
 
-#CCA3 <- getCCA3(X=X, Y=Y, Z=Z, numCV=9, end=end, step=step)
 ```
 
 The higher the lambdas, the more sparse the canonical variables will be.
@@ -167,7 +174,7 @@ ggplot(data=data.frame(x=seq(along=CCA3$corr), y=CCA3$corr),
 
 
 ```{r}
-  plotCCA(CCA3, X, Y, filename = NULL, legend=c("metabolites", "genes", "design"))
+  plotCCA(CCA3, X, filename = NULL, legend=c("metabolites", "genes", "design"))
 ```
 
 ## Details of canonical variables
@@ -178,9 +185,9 @@ topN <- 1:10
 
 kable(CCA3$cc3.weight.z[order(abs(CCA3$cc3.weight.z[,numCV]), decreasing=TRUE)[topN], numCV],
       digits=3) %>% kable_styling(full_width = F, position = "left")
-kable(CCA3$cc3.weight.x[order(abs(CCA3$cc3.weight.x[,numCV]), decreasing=TRUE)[topN], numCV],
+kable(CCA3$cc3.weight.x[[1]][order(abs(CCA3$cc3.weight.x[[1]][,numCV]), decreasing=TRUE)[topN], numCV],
       digits=3) %>% kable_styling(full_width = F, position = "center")
-kable(CCA3$cc3.weight.y[order(abs(CCA3$cc3.weight.y[,numCV]), decreasing=TRUE)[topN], numCV],
+kable(CCA3$cc3.weight.x[[2]][order(abs(CCA3$cc3.weight.x[[2]][,numCV]), decreasing=TRUE)[topN], numCV],
       digits=3) %>% kable_styling(full_width = F, position = "right")
 
 ```
@@ -190,7 +197,7 @@ kable(CCA3$cc3.weight.y[order(abs(CCA3$cc3.weight.y[,numCV]), decreasing=TRUE)[t
 ```{r}
 # Combine the lists into a single data frame
 
-canVars = as.tibble(cbind(canVar=seq(along=CCA3$corr), corr = CCA3$corr))
+canVars = as_tibble(cbind(canVar=seq(along=CCA3$corr), corr = CCA3$corr))
 
 lambdas <- data.frame(matrix=c("X", "Y", "Z")[seq_along(rownames(CCA3$lambda))],
                  CCA3$lambda)
@@ -217,10 +224,10 @@ print(combined_tibble)
 
 ```{r}
 
-canVarX <- data.frame(matrix="X", sampleName=rownames(CCA3$cc3.CV.x), CCA3$cc3.CV.x)
+canVarX <- data.frame(matrix="X", sampleName=rownames(CCA3$cc3.CV.x[[1]]), CCA3$cc3.CV.x[[1]])
 colnames(canVarX) <- c("matrix", "sampleName", seq(1,ncol(canVarX)-2))
 
-canVarY <- data.frame(matrix="Y", sampleName=rownames(CCA3$cc3.CV.y), CCA3$cc3.CV.y)
+canVarY <- data.frame(matrix="Y", sampleName=rownames(CCA3$cc3.CV.x[[2]]), CCA3$cc3.CV.x[[2]])
 colnames(canVarY) <- c("matrix", "sampleName", seq(1,ncol(canVarY)-2))
 
 canVarZ <- data.frame(matrix="Z", sampleName=rownames(CCA3$cc3.CV.z), CCA3$cc3.CV.z)
@@ -247,10 +254,10 @@ ggplot(data=canVar_long %>% filter(canVar==1),
 
 ```{r}
 
-weightsX <- data.frame(matrix="X", featureName=rownames(CCA3$cc3.weight.x), CCA3$cc3.weight.x)
+weightsX <- data.frame(matrix="X", featureName=rownames(CCA3$cc3.weight.x[[1]]), CCA3$cc3.weight.x[[1]])
 colnames(weightsX) <- c("matrix", "featureName", seq(1,ncol(weightsX)-2))
 
-weightsY <- data.frame(matrix="Y", featureName=rownames(CCA3$cc3.weight.y), CCA3$cc3.weight.y)
+weightsY <- data.frame(matrix="Y", featureName=rownames(CCA3$cc3.weight.x[[2]]), CCA3$cc3.weight.x[[2]])
 colnames(weightsY) <- c("matrix", "featureName", seq(1,ncol(weightsY)-2))
 
 weightsZ <- data.frame(matrix="Z", featureName=rownames(CCA3$cc3.weight.z), CCA3$cc3.weight.z)
@@ -263,8 +270,8 @@ weights_long <- pivot_longer(as.tibble(weights),
                         names_to="canVar",
                         names_transform = list(canVar = as.integer))
 
-values <- as.tibble(bind_rows(data.frame(matrix="X", featureName=colnames(X), t(X)),
-                  data.frame(matrix="Y", featureName=colnames(Y), t(Y)),
+values <- as.tibble(bind_rows(data.frame(matrix="X", featureName=colnames(X[[1]]), t(X[[1]])),
+                  data.frame(matrix="Y", featureName=colnames(X[[2]]), t(X[[2]])),
                 data.frame(matrix="Z", featureName=colnames(Z), t(Z))))
 
 
@@ -297,7 +304,7 @@ ggplot(data=topFeatures_values,
 ## Saving results
 
 ```{r}
-save.CCA(CCA3, file="CCA3")
+#save.CCA(CCA3, filename="CCA3",omic.names=c('Transcripts','Metabolites'))
 ```
 
 

@@ -1,24 +1,29 @@
 Package: spCCA
 Type: Package
-Title: supervised penalized CCA for three data sets (2 biological, 1 design)
-Version: 0.1.6
-Date: 2024-12-25
+Title: supervised penalized CCA for n+1 data sets (n biological, 1 design)
+Version: 0.1.7
+Date: 2026-06-03
 Imports:
-    MASS
+    MASS,
+    parallel,
+    doParallel,
+    foreach,
+    doRNG
 Suggests: 
     testthat (>= 3.0.0),
     BiocStyle,
     knitr, kableExtra, ggplot2, tidyverse,
     rmarkdown
-Author: Andrea Thum, Steffen Neumann, Stefan Posch
-Author@R: c(person("Andrea", "Thum", role = "cre", email="andrea.thum@informatik.uni-halle.de"),
-           person("Steffen", "Neumann", role = , email="sneumann@ipb-halle.de"),
-           person("Stefan", "Posch", role = "aut", email="posch@informatik.uni-halle.de"))
+Author: Anjana Bhat, Andrea Thum, Steffen Neumann, Stefan Posch
+Author@R: c(person("Anjana", "Bhat", role = , email="anjana.bhat@ipb-halle.de"),
+	    person("Andrea", "Thum", role = "cre", email="andrea.thum@informatik.uni-halle.de"),
+            person("Steffen", "Neumann", role = , email="sneumann@ipb-halle.de"),
+            person("Stefan", "Posch", role = "aut", email="posch@informatik.uni-halle.de"))
 Maintainer: Steffen Neumann <sneumann@ipb-halle.de>
-Description: Combines sparse (penalized) CCA for 2 biological data sets 
-  with a third data set, the experimental design and tries to find correlations 
+Description: Combines sparse (penalized) CCA for n biological data sets 
+  with the experimental design and tries to find correlations 
   between biological data sets and design data set, that are well-explainable.
-License: GPL (>= 2)
+License: file LICENSE 
 Collate: getCCA3.R
      get.best.lambdas.R
      plotCCA.R
@@ -27,4 +32,5 @@ Collate: getCCA3.R
      spCCA-package.R
      spCCA_functions.R
 VignetteBuilder: knitr 
-RoxygenNote: 7.3.1
+Encoding: UTF-8
+RoxygenNote: 8.0.0
