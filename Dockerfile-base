@@ -1,0 +1,13 @@
+# syntax=docker/dockerfile:1.3-labs
+FROM rocker/shiny:4.5
+
+#LABEL maintainer="Steffen Neumann <sneumann@ipb-halle.de>"
+LABEL Description="spCCA Web Application Base Image with dependencies."
+
+ADD DESCRIPTION /tmp/spCCA/DESCRIPTION
+WORKDIR /tmp/spCCA/
+
+RUN R -e 'options(warn=2) ; install.packages(c("devtools", "BiocManager"))'
+RUN R -e 'pak::local_install_deps()'
+
+WORKDIR /srv/shiny-server
